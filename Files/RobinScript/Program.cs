@@ -21,9 +21,116 @@ namespace RobinScript
     {
         public class Program
         {
-
+            // memory
+            static private Dictionary<string, Source> Variables = new Dictionary<string, Source>();
+            static private Dictionary<string, Source> Functions = new Dictionary<string, Source>();
+            static private Dictionary<string, Source> Classes = new Dictionary<string, Source>();
+            static private Dictionary<string, Source> IfStatement = new Dictionary<string, Source>();
+            static private Dictionary<string, Source> ForStatement = new Dictionary<string, Source>();
+            static private Dictionary<string, Source> WhileStatement = new Dictionary<string, Source>();
+            static private Dictionary<string, Source> LoopStatement = new Dictionary<string, Source>();
+            // get
+            public static string GetVariable(string name)
+            {
+                if (Variables.ContainsKey(name))
+                    return Variables[name].ToString();
+                else
+                    return null;
+            }
+            public static string GetFunction(string name)
+            {
+                if (Functions.ContainsKey(name))
+                    return Functions[name].ToString();
+                else
+                    return null;
+            }
+            public static string GetClass(string name)
+            {
+                if (Classes.ContainsKey(name))
+                    return Classes[name].ToString();
+                else
+                    return null;
+            }
+            public static string GetIfStatement(string name)
+            {
+                if (IfStatement.ContainsKey(name))
+                    return IfStatement[name].ToString();
+                else
+                    return null;
+            }
+            public static string GetForStatement(string name)
+            {
+                if (ForStatement.ContainsKey(name))
+                    return ForStatement[name].ToString();
+                else
+                    return null;
+            }
+            public static string GetWhileStatement(string name)
+            {
+                if (WhileStatement.ContainsKey(name))
+                    return WhileStatement[name].ToString();
+                else
+                    return null;
+            }
+            public static string GetLoopStatement(string name)
+            {
+                if (LoopStatement.ContainsKey(name))
+                    return LoopStatement[name].ToString();
+                else
+                    return null;
+            }
+            // set or init
+            public static void SetVariable(string key, Source value)
+            {
+                if (!Functions.ContainsKey(key))
+                    Functions.Add(key, value);
+                else
+                    Functions[key] = value;
+            }
+            public static void InitFunction(string key, Source value)
+            {
+                if (!Functions.ContainsKey(key))
+                    Functions.Add(key, value);
+                else
+                    throw new Exception("'" + key + "' already exists!");
+            }
+            public static void InitClass(string name)
+            {
+                if (Classes.ContainsKey(name))
+                    return Classes[name].ToString();
+                else
+                    return null;
+            }
+            public static void InitIfStatement(string name)
+            {
+                if (IfStatement.ContainsKey(name))
+                    return IfStatement[name].ToString();
+                else
+                    return null;
+            }
+            public static void InitForStatement(string name)
+            {
+                if (ForStatement.ContainsKey(name))
+                    return ForStatement[name].ToString();
+                else
+                    return null;
+            }
+            public static void InitWhileStatement(string name)
+            {
+                if (WhileStatement.ContainsKey(name))
+                    return WhileStatement[name].ToString();
+                else
+                    return null;
+            }
+            public static void InitLoopStatement(string name)
+            {
+                if (LoopStatement.ContainsKey(name))
+                    return LoopStatement[name].ToString();
+                else
+                    return null;
+            }
         }
-        public enum TokensType
+        public enum Tokens
         {
             Function,
             Class,
@@ -65,6 +172,13 @@ namespace RobinScript
             Input, // console input: param -> (var_into_store_input_value)
             Init, // initialize a class in a variable
             Cast, // cast a variable: param -> (var_to_cast, int) where int is the type in to cast 'var_to_cast'
+        }
+    }
+    class Source
+    {
+        public override string ToString()
+        {
+            return base.ToString();
         }
     }
 }
