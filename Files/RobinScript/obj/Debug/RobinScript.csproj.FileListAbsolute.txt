@@ -15,3 +15,6 @@ C:\Users\Mondelli\Desktop\RobinScript\Output\RobinScript.pdb
 C:\Users\Mondelli\Desktop\RobinScript\RobinScript\Output\RobinScript.exe.config
 C:\Users\Mondelli\Desktop\RobinScript\RobinScript\Files\RobinScript\obj\Debug\RobinScript.exe
 C:\Users\Mondelli\Desktop\RobinScript\RobinScript\Files\RobinScript\obj\Debug\RobinScript.pdb
+C:\Users\Mondelli\Desktop\RobinScript\RobinScript\Files\RobinScript\obj\Debug\RobinScript.csprojResolveAssemblyReference.cache
+C:\Users\Mondelli\Desktop\RobinScript\RobinScript\Output\RobinScript.exe
+C:\Users\Mondelli\Desktop\RobinScript\RobinScript\Output\RobinScript.pdb
