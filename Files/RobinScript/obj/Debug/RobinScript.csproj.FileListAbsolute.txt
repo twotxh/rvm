@@ -1,0 +1,14 @@
+C:\Users\Mondelli\Documents\Visual Studio 2012\Projects\RobinScript\RobinScript\bin\Debug\RobinScript.exe.config
+C:\Users\Mondelli\Desktop\RobinScript\RobinScript.exe.config
+C:\Users\Mondelli\Desktop\RobinScript\RobinScript.exe
+C:\Users\Mondelli\Desktop\RobinScript\RobinScript.pdb
+C:\Users\Mondelli\Documents\Visual Studio 2012\Projects\RobinScript\RobinScript\obj\Debug\RobinScript.csprojResolveAssemblyReference.cache
+C:\Users\Mondelli\Documents\Visual Studio 2012\Projects\RobinScript\RobinScript\obj\Debug\RobinScript.exe
+C:\Users\Mondelli\Documents\Visual Studio 2012\Projects\RobinScript\RobinScript\obj\Debug\RobinScript.pdb
+C:\Users\Desktop\RobinScript\RobinScript.exe.config
+C:\Users\Mondelli\Desktop\RobinScript\Files\RobinScript\obj\Debug\RobinScript.csprojResolveAssemblyReference.cache
+C:\Users\Mondelli\Desktop\RobinScript\Files\RobinScript\obj\Debug\RobinScript.exe
+C:\Users\Mondelli\Desktop\RobinScript\Files\RobinScript\obj\Debug\RobinScript.pdb
+C:\Users\Mondelli\Desktop\RobinScript\Output\RobinScript.exe.config
+C:\Users\Mondelli\Desktop\RobinScript\Output\RobinScript.exe
+C:\Users\Mondelli\Desktop\RobinScript\Output\RobinScript.pdb
