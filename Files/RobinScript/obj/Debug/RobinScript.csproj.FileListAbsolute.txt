@@ -12,3 +12,6 @@ C:\Users\Mondelli\Desktop\RobinScript\Files\RobinScript\obj\Debug\RobinScript.pd
 C:\Users\Mondelli\Desktop\RobinScript\Output\RobinScript.exe.config
 C:\Users\Mondelli\Desktop\RobinScript\Output\RobinScript.exe
 C:\Users\Mondelli\Desktop\RobinScript\Output\RobinScript.pdb
+C:\Users\Mondelli\Desktop\RobinScript\RobinScript\Output\RobinScript.exe.config
+C:\Users\Mondelli\Desktop\RobinScript\RobinScript\Files\RobinScript\obj\Debug\RobinScript.exe
+C:\Users\Mondelli\Desktop\RobinScript\RobinScript\Files\RobinScript\obj\Debug\RobinScript.pdb
