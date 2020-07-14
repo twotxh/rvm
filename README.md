@@ -42,9 +42,9 @@ class Program {
 c = Init($Program.main());
 ```
 # Icon: Logo
-![RobinScript Logo](/RobinScript/Logos/RobinLogo.ico)
+![RobinScript Logo](/Logos/RobinLogo.ico)
 _Program Icon_
 ________
 # Icon: ScriptFile
-![RobinScript Files Logo](/RobinScript/Logos/RobinScript.ico)
+![RobinScript Files Logo](/Logos/RobinScript.ico)
 _When a new .rbs script is created, that file will take this icon_
