@@ -83,7 +83,7 @@ namespace RobinScript
             }
 
 
-            else if (LineEmptyString.Pop(" ").Replace("=", " = ").Split(' ')[1] == "=")
+            else if (LineEmptyString.Value.Contains('=') && LineEmptyString.Pop(" ").Replace("=", " = ").Split(' ')[1] == "=")
                 ProcessTable.AddToProcessTable(Process.Type.Variable, LineEmptyString.Select(0, LineEmptyString.Value.IndexOf('=')).Replace(" ", ""), "TEST", Line.Value.Substring(Line.Value.IndexOf('=') + 1));
             return ProcessTable;
         }
