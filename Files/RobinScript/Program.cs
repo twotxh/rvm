@@ -11,22 +11,50 @@ namespace RobinScript
     {
         static void Main(string[] args)
         {
-            while (true) {
-                Console.Write("[> ");
-                Tools.ExecLine(Console.ReadLine());
+            switch (args.Count())
+            {
+                case 0:
+                    Welcome();
+                    while (true) {
+                        Console.Write("[> ");
+                        Tools.ExecLine(Console.ReadLine());
+                    }
+                default:
+                    for (int i = 0; i < args.Count(); i++) {
+                        Console.WriteLine(i);
+                        Tools.ExecFile(args[i]);
+                    }break;
             }
+        }
+
+        private static void Welcome()
+        {
+            Console.WriteLine("RobinScript 0.5 (32 bit/ 64 bit) - State: OpenSource, Licese: Apache Licese 2.0 \nAuthor: Carpal, Repository: https://github.com/Carpall/RobinScript");
         }
     }
     class Tools
     {
+        public static int LineCounter = 0;
         public static void ExecLine(string Line)
         {
+            // fix shell
             if (!string.IsNullOrWhiteSpace(Line))
             {
                 Lexer.GetProcessTable(Line);
                 Interpreter Robin = new Interpreter();
                 Robin.Run();
             }
+        }
+        public static void ExecFile(string Path)
+        {
+            string[] Code = System.IO.File.ReadAllLines(Path);
+            for (int i = 0; i < Code.Count(); i++) {
+                LineCounter++;
+                if (!string.IsNullOrWhiteSpace(Code[i]))
+                    Lexer.GetProcessTable(Code[i]);
+            }
+            Interpreter Robin = new Interpreter();
+            Robin.Run();
         }
     }
     class Lexer
@@ -285,6 +313,7 @@ namespace RobinScript
     {
         public static void InitializeComponent(Storage.Program Ram)
         {
+            // install stdfunction // istall stdclass // install std var
         }
     }
 }
