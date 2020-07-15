@@ -1,4 +1,4 @@
-﻿
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -21,7 +21,6 @@ namespace RobinScript
     {
         public static void ExecLine(string Line)
         {
-            Console.WriteLine("1.EXECLINE");
             if (!string.IsNullOrWhiteSpace(Line))
             {
                 Lexer.GetProcessTable(Line);
@@ -34,31 +33,40 @@ namespace RobinScript
     {
         public static void GetProcessTable(string Line)
         {
-            Console.WriteLine("2.LEXER");
         }
     }
     class Interpreter
     {
         public void Run()
         {
-            Console.WriteLine("3.INTERPRETER");
             Storage.Program Ram = new Storage.Program();
+            BuiltIn.InitializeComponent(Ram);
             for (int i = 0; i <  Storage.ProcessCounter; i++) {
-                Process.Runtime(Storage.GetProcessName()[i], Storage.GetProcessNameArg()[i], Storage.GetProcessArg()[i], Ram);
+                Process.RunProcess(Storage.GetProcessType()[i], Storage.GetProcessName()[i], Storage.GetProcessNameArg()[i], Storage.GetProcessArg()[i], Ram);
             }
         }
     }
     class Process
     {
-        public static void Runtime(Type ProcessType, string ProcessNameArg, object ProcessArg, Storage.Program Ram)
+        class Runtime
         {
-            Console.WriteLine("4.RUNTIME");
-            if (ProcessType == Type.Print)
-                Console.Write(ProcessArg);
-            else if (ProcessType == Type.Variable)
-                Ram.SetVariable(ProcessNameArg, ProcessArg);
-            else if (ProcessType == Type.Println)
-                Console.WriteLine(ProcessArg);
+            public static void Print(string arg) { Console.Write(arg); }
+            public static void Println(string arg) { Console.WriteLine(arg); }
+            public static void Printf(string arg) { Console.Write(arg); }
+            public static void Prints(int spam, string arg) {
+                for (int i = 0; i < spam; i++) { Console.Write(arg); }
+            }
+            public static void Printlns(int spam, string arg)
+            {
+                for (int i = 0; i < spam; i++) { Console.WriteLine(arg); }
+            }
+        }
+        public static void RunProcess(Type ProcessType, string ProcessName, string ProcessNameArg, object ProcessArg, Storage.Program Ram)
+        {
+            switch (ProcessType) {
+                case Type.Variable: Ram.SetVariable(ProcessName, ProcessArg); break;
+                case Type.Print: Runtime.Print(ProcessArg.ToString()); break;
+            }
         }
         public enum Type {
             Function,
@@ -93,6 +101,7 @@ namespace RobinScript
             RenameFile,
             Print, // print
             Println, // print + \n
+            Printlns, // spam string print +\n 
             Prints, // spam string: param -> ("string", 10) where int is the time to spam "string"
             Printf, // print a format string
             Input, // console input: param -> (var_into_store_input_value)
@@ -213,18 +222,21 @@ namespace RobinScript
                     throw new Exception("'" + key + "' already exists!");
             }
         }
-        private static List<Process.Type> ProcessName = new List<Process.Type>();
+        private static List<Process.Type> ProcessType = new List<Process.Type>();
+        private static List<string> ProcessName = new List<string>();
         private static List<string> ProcessNameArg = new List<string>();
         private static List<object> ProcessArg = new List<object>();
         public static int ProcessCounter = 0;
-        public static void AddToProcessTable(Process.Type _processName, string _processNameArg, object _processArg)
+        public static void AddToProcessTable(Process.Type _processType, string _processName, string _processNameArg, object _processArg)
         {
+            ProcessType.Add(_processType);
             ProcessName.Add(_processName);
             ProcessNameArg.Add(_processNameArg);
             ProcessArg.Add(_processArg);
             ProcessCounter++;
         }
-        public static List<Process.Type> GetProcessName() { return ProcessName; }
+        public static List<Process.Type> GetProcessType() { return ProcessType; }
+        public static List<string> GetProcessName() { return ProcessName; }
         public static List<string> GetProcessNameArg() { return ProcessNameArg; }
         public static List<object> GetProcessArg() { return ProcessArg; }
     }
@@ -251,6 +263,28 @@ namespace RobinScript
         public string ToString()
         {
             return Value;
+        }
+    }
+    class Debuger
+    {
+        public static void print(string toPrint, object arg0 = null, object arg1 = null, object arg2 = null, object arg3 = null) { Console.WriteLine(toPrint + ' ' + arg0 + ' ' + arg1 + ' ' + arg2 + ' ' + arg3); }
+        public void Debug(string line)
+        {
+        }
+        public static void Except(int line, string istruction, string error, string tip)
+        {
+            istruction += '\n';
+            for (int i=0;i<istruction.Length;i++) {
+                istruction += '^';
+            }
+            istruction+= " -> ";
+            throw new Exception(line+" | "+istruction+error+"\nTip: "+tip);
+        }
+    }
+    class BuiltIn
+    {
+        public static void InitializeComponent(Storage.Program Ram)
+        {
         }
     }
 }
