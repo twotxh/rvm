@@ -17,7 +17,7 @@ namespace RobinScript
                     Welcome();
                     while (true) {
                         Console.Write("[> ");
-                        Tools.ExecLine(Console.ReadLine());
+                        Tools.ExecLine(Console.ReadLine(), new Storage());
                     }
                 default:
                     for (int i = 0; i < args.Count(); i++) {
@@ -35,42 +35,67 @@ namespace RobinScript
     class Tools
     {
         public static int LineCounter = 0;
-        public static void ExecLine(string Line)
+        public static void ExecLine(string _line, Storage _processTable)
         {
             // fix shell
-            if (!string.IsNullOrWhiteSpace(Line))
+            if (!string.IsNullOrWhiteSpace(_line))
             {
-                Lexer.GetProcessTable(Line);
+                Source Line = new Source();
+                Line.Value = _line;
+                Source LineEmptyString = new Source();
+                LineEmptyString.Value = _line; LineEmptyString.Value = LineEmptyString.GetEmptyString();
+                Storage ProcessTable = Lexer.GetProcessTable(Line, LineEmptyString, _processTable);
                 Interpreter Robin = new Interpreter();
-                Robin.Run();
+                Robin.Run(ProcessTable);
             }
         }
         public static void ExecFile(string Path)
         {
             string[] Code = System.IO.File.ReadAllLines(Path);
+            Source Line = new Source();
+            Source LineEmptyString = new Source();
+            Storage ProcessTable = new Storage();
             for (int i = 0; i < Code.Count(); i++) {
                 LineCounter++;
-                if (!string.IsNullOrWhiteSpace(Code[i]))
-                    Lexer.GetProcessTable(Code[i]);
+                if (!string.IsNullOrWhiteSpace(Code[i])) {
+                    Line.Value = Code[i];
+                    LineEmptyString.Value = Line.GetEmptyString();
+                    ProcessTable = Lexer.GetProcessTable(Line, LineEmptyString, ProcessTable);
+                }
             }
             Interpreter Robin = new Interpreter();
-            Robin.Run();
+            Robin.Run(ProcessTable);
         }
     }
     class Lexer
     {
-        public static void GetProcessTable(string Line)
+        private static bool isIndentArea = false; private static Process.Type _LastProcessType = Process.Type.Null; private static string _LastProcessName = string.Empty; private static string _LastProcessNameArg = string.Empty; private static StringBuilder _LastProcessArg = new StringBuilder();
+        public static Storage GetProcessTable(Source Line, Source LineEmptyString, Storage ProcessTable)
         {
+            if (isIndentArea) {
+                if (Line.Pop(" ") == "}") {
+                    isIndentArea = false;
+                    ProcessTable.AddToProcessTable(_LastProcessType, _LastProcessName, _LastProcessNameArg, _LastProcessArg);
+                }
+                else {
+                    _LastProcessArg.AppendLine(Line.ToString());
+                }
+            }
+
+
+            else if (LineEmptyString.Pop(" ").Replace("=", " = ").Split(' ')[1] == "=")
+                ProcessTable.AddToProcessTable(Process.Type.Variable, LineEmptyString.Select(0, LineEmptyString.Value.IndexOf('=')).Replace(" ", ""), "TEST", Line.Value.Substring(Line.Value.IndexOf('=') + 1));
+            return ProcessTable;
         }
     }
     class Interpreter
     {
-        public void Run()
+        public void Run(Storage ProcessTable)
         {
             Storage.Program Ram = new Storage.Program();
             BuiltIn.InitializeComponent(Ram);
-            for (int i = 0; i <  Storage.ProcessCounter; i++) {
-                Process.RunProcess(Storage.GetProcessType()[i], Storage.GetProcessName()[i], Storage.GetProcessNameArg()[i], Storage.GetProcessArg()[i], Ram);
+            for (int i = 0; i <  ProcessTable.ProcessCounter; i++) {
+                Process.RunProcess(ProcessTable.GetProcessType()[i], ProcessTable.GetProcessName()[i], ProcessTable.GetProcessNameArg()[i], ProcessTable.GetProcessArg()[i], Ram);
             }
         }
     }
@@ -97,6 +122,7 @@ namespace RobinScript
             }
         }
         public enum Type {
+            Null,
             Function,
             Class,
             For,
@@ -143,12 +169,12 @@ namespace RobinScript
         {
             // memory
             private Dictionary<string, object> Variables = new Dictionary<string, object>();
-            private Dictionary<string, object> Functions = new Dictionary<string, object>();
-            private Dictionary<string, object> Classes = new Dictionary<string, object>();
-            private Dictionary<string, object> IfStatement = new Dictionary<string, object>();
-            private Dictionary<string, object> ForStatement = new Dictionary<string, object>();
-            private Dictionary<string, object> WhileStatement = new Dictionary<string, object>();
-            private Dictionary<string, object> LoopStatement = new Dictionary<string, object>();
+            private Dictionary<string, Source> Functions = new Dictionary<string, Source>();
+            private Dictionary<string, Source> Classes = new Dictionary<string, Source>();
+            private Dictionary<string, Source> IfStatement = new Dictionary<string, Source>();
+            private Dictionary<string, Source> ForStatement = new Dictionary<string, Source>();
+            private Dictionary<string, Source> WhileStatement = new Dictionary<string, Source>();
+            private Dictionary<string, Source> LoopStatement = new Dictionary<string, Source>();
             // get
             public string GetVariable(string name)
             {
@@ -202,60 +228,52 @@ namespace RobinScript
             // set or init
             public void SetVariable(string key, object value)
             {
-                if (!Functions.ContainsKey(key))
-                    Functions.Add(key, value);
+                if (!Variables.ContainsKey(key))
+                    Variables.Add(key, value);
                 else
-                    Functions[key] = value;
+                    Variables[key] = value;
             }
-            public void InitFunction(string key, object value)
+            public void InitFunction(string key, Source value)
             {
                 if (!Functions.ContainsKey(key))
                     Functions.Add(key, value);
                 else
                     throw new Exception("'" + key + "' already exists!");
             }
-            public void InitClass(string key, object value)
+            public void InitClass(string key, Source value)
             {
                 if (!Classes.ContainsKey(key))
                     Classes.Add(key, value);
                 else
                     throw new Exception("'" + key + "' already exists!");
             }
-            public void InitIfStatement(string key, object value)
+            public void InitIfStatement(string key, Source value)
             {
                 if (!IfStatement.ContainsKey(key))
                     IfStatement.Add(key, value);
-                else
-                    throw new Exception("'" + key + "' already exists!");
             }
-            public void InitForStatement(string key, object value)
+            public void InitForStatement(string key, Source value)
             {
                 if (!ForStatement.ContainsKey(key))
                     ForStatement.Add(key, value);
-                else
-                    throw new Exception("'" + key + "' already exists!");
             }
-            public void InitWhileStatement(string key, object value)
+            public void InitWhileStatement(string key, Source value)
             {
                 if (!WhileStatement.ContainsKey(key))
                     WhileStatement.Add(key, value);
-                else
-                    throw new Exception("'" + key + "' already exists!");
             }
-            public void InitLoopStatement(string key, object value)
+            public void InitLoopStatement(string key, Source value)
             {
                 if (!LoopStatement.ContainsKey(key))
                     LoopStatement.Add(key, value);
-                else
-                    throw new Exception("'" + key + "' already exists!");
             }
         }
-        private static List<Process.Type> ProcessType = new List<Process.Type>();
-        private static List<string> ProcessName = new List<string>();
-        private static List<string> ProcessNameArg = new List<string>();
-        private static List<object> ProcessArg = new List<object>();
-        public static int ProcessCounter = 0;
-        public static void AddToProcessTable(Process.Type _processType, string _processName, string _processNameArg, object _processArg)
+        private List<Process.Type> ProcessType = new List<Process.Type>();
+        private List<string> ProcessName = new List<string>();
+        private List<string> ProcessNameArg = new List<string>();
+        private List<object> ProcessArg = new List<object>();
+        public int ProcessCounter = 0;
+        public void AddToProcessTable(Process.Type _processType, string _processName, string _processNameArg, object _processArg)
         {
             ProcessType.Add(_processType);
             ProcessName.Add(_processName);
@@ -263,10 +281,10 @@ namespace RobinScript
             ProcessArg.Add(_processArg);
             ProcessCounter++;
         }
-        public static List<Process.Type> GetProcessType() { return ProcessType; }
-        public static List<string> GetProcessName() { return ProcessName; }
-        public static List<string> GetProcessNameArg() { return ProcessNameArg; }
-        public static List<object> GetProcessArg() { return ProcessArg; }
+        public List<Process.Type> GetProcessType() { return ProcessType; }
+        public List<string> GetProcessName() { return ProcessName; }
+        public List<string> GetProcessNameArg() { return ProcessNameArg; }
+        public List<object> GetProcessArg() { return ProcessArg; }
     }
     class Source
     {
@@ -287,6 +305,33 @@ namespace RobinScript
 
             }
             return toReturn;
+        }
+        public string Pop(string str)
+        {
+            return Value.Replace(str, string.Empty);
+        }
+        public bool AsKeyword(string keyword)
+        {
+            try
+            {
+                int FirstLetterIndex = 0;
+                for (int i = 0; i < Value.Length; i++)
+                {
+                    if (Value[i] == ' ')
+                        FirstLetterIndex++;
+                    else
+                        break;
+                }
+                if (FirstLetterIndex >= 1)
+                    return (Value.Remove(0, FirstLetterIndex).Substring(0, keyword.Length) == keyword) ? true : false;
+                else
+                    return (Value.Substring(0, keyword.Length) == keyword) ? true : false;
+            }
+            catch (ArgumentOutOfRangeException) { return false; }
+        }
+        public string Select(int startIndex, int finishIndex)
+        {
+            return Value.Substring(startIndex, finishIndex - startIndex);
         }
         public string ToString()
         {
