@@ -14,37 +14,38 @@ _________________________________
 ________________________________
 # Hello World
 ```
-$print("Hello, World!");
+$print("Hello, World!")
 ```
 ____
 
 ```
-var = "Hello, World"+"!";
-$print(%var%);
+var = "Hello, World"+"!"
+$print(%var%)
 ```
 ____
 
 ```
-$add(420, 69);
+
 fn add(n, n1) {
   return %n%+%n1%;
 }
+$add(420, 69)
 ```
 ____
 
 ```
 class Program {
   fn main() {
-    $input(x);
-    $print(x);
+    $input(x)
+    $print(x)
   }
 }
-c = Init($Program.main());
+c = Init(Program.main())
 ```
 # Icon: Logo
-![RobinScript Logo](/Logos/RobinLogo.ico)
-_Program Icon_
+![RobinScript Logo](/Logos/RobinLogo.ico) <br>
+***Program Icon***
 ________
 # Icon: ScriptFile
-![RobinScript Files Logo](/Logos/RobinScript.ico)
-_When a new .rbs script is created, that file will take this icon_
+![RobinScript Files Logo](/Logos/RobinScript.ico) <br>
+***When a new .rbs script is created, that file will take this icon***
