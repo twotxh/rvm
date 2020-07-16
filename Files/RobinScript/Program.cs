@@ -23,6 +23,7 @@ namespace RobinScript
                     for (int i = 0; i < args.Count(); i++) {
                         Console.WriteLine(i);
                         Tools.ExecFile(args[i]);
+                        Tools.GetExecuteTime();
                     }break;
             }
         }
@@ -49,6 +50,7 @@ namespace RobinScript
                 Robin.Run(ProcessTable);
             }
         }
+        private static System.Diagnostics.Stopwatch ExecuteTimer = new System.Diagnostics.Stopwatch();
         public static void ExecFile(string Path)
         {
             string[] Code = System.IO.File.ReadAllLines(Path);
@@ -64,7 +66,14 @@ namespace RobinScript
                 }
             }
             Interpreter Robin = new Interpreter();
+            ExecuteTimer.Start();
             Robin.Run(ProcessTable);
+            ExecuteTimer.Stop();
+        }
+        public static void GetExecuteTime()
+        {
+            Console.WriteLine("Execute time: {0}ms", ExecuteTimer.ElapsedMilliseconds);
+            Console.ReadKey();
         }
     }
     class Lexer
@@ -78,14 +87,44 @@ namespace RobinScript
                     ProcessTable.AddToProcessTable(_LastProcessType, _LastProcessName, _LastProcessNameArg, _LastProcessArg);
                 }
                 else {
-                    _LastProcessArg.AppendLine(Line.ToString());
+                    _LastProcessArg.AppendLine(Line.Value);
                 }
             }
 
-
-            else if (LineEmptyString.Value.Contains('=') && LineEmptyString.Pop(" ").Replace("=", " = ").Split(' ')[1] == "=")
-                ProcessTable.AddToProcessTable(Process.Type.Variable, LineEmptyString.Select(0, LineEmptyString.Value.IndexOf('=')).Replace(" ", ""), "TEST", Line.Value.Substring(Line.Value.IndexOf('=') + 1));
+            foreach (string s in Line.GetWordWrapList(" ( , ) = "))
+                Console.WriteLine(s);
+            //Tokenizer TokenTable = Tokenizer.GetTokenTable(Line, Tokenizer.GetWordWrapList(Line.Value, " "));
             return ProcessTable;
+        }
+    }
+    class Tokenizer
+    {
+        public List<Types> TokenType = new List<Types>(); 
+        public List<string> TokenValue = new List<string>();
+        public static Tokenizer GetTokenTable(Source Line, List<string> WordWrapped)
+        {
+            Tokenizer TokenTable = new Tokenizer(); // fn main()
+            //List<string> LineTokenized = ;
+            return TokenTable;
+        }
+        public void Add(Types _tokenType, string _tokenValue)
+        {
+            TokenType.Add(_tokenType);
+            TokenValue.Add(_tokenValue);
+        }
+        public enum Types {
+            Undefined,
+            FunctionDescribement,
+            CallingFunction,
+            ClassDescribement,
+            InitClass,
+            FunctionParameter,
+            String,
+            Object,
+            Load,
+            VariableAssigment,
+            CallingVariable,
+            Use,
         }
     }
     class Interpreter
@@ -332,6 +371,63 @@ namespace RobinScript
         public string Select(int startIndex, int finishIndex)
         {
             return Value.Substring(startIndex, finishIndex - startIndex);
+        }
+        public string RemoveComments(string commentsChar)
+        {
+            string result = "";
+            bool isInterpolate = false;
+            for (int i = 0; i < Value.Length; i++) {
+                if (Value[i] == '"') {
+                    isInterpolate = (!isInterpolate) ? true : false;
+                    result += '"';
+                } else if (Value[i] == commentsChar[0] && Value[i + 1] == commentsChar[1] && !isInterpolate) {
+                    break;
+                } else {
+                    result += Value[i];
+                }
+            }
+            return result;
+        }
+        public List<string> GetWordWrapList(string PatternToSplit)
+        {
+            // cambiare in value
+            List<string> Words = new List<string>();
+            string Word = string.Empty;
+            bool isInterpolate = false;
+            for (int j = 0; j < PatternToSplit.Length; j++)
+            {
+                // ciclare il pattern e appoggiare il ciclo del testo sul pattern[j]
+                for (int i = 0; i < Value.Length; i++)
+                {
+                    if (isInterpolate)
+                    {
+                        if (Value[i] == '"')
+                        {
+                            Word += '"';
+                            isInterpolate = false;
+                            continue;
+                        }
+                        else
+                        {
+                            Word += Value[i];
+                            continue;
+                        }
+                    }
+                    else
+                    {
+                        if (Value[i] == '"') isInterpolate = true;
+                        else if (PatternToSplit.Contains(Value[i]) && !string.IsNullOrWhiteSpace(Word))
+                        {
+                            Words.Add(Word);
+                            Word = string.Empty;
+                        }
+                        else
+                            Word += Value[i];
+                    }
+                } if (!string.IsNullOrWhiteSpace(Word))
+                    Words.Add(Word);
+            }
+            return Words;
         }
         public string ToString()
         {
