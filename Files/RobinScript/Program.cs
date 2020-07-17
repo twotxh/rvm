@@ -90,8 +90,10 @@ namespace RobinScript
                     _LastProcessArg.AppendLine(Line.Value);
                 }
             }
-
-            Tokenizer TokenTable = Tokenizer.GetTokenTable(Line, Line.GetWordWrapList("(,)= "));
+            Tokenizer TokenTable = Tokenizer.GetTokenTable(Line, Line.GetWordWrapList("(,) "));
+            for (int i = 0; i < TokenTable.TokenName.Count; i++) {
+                Console.WriteLine("Type: {0}, Name: {1}, Value: {2}", TokenTable.TokenType[i], TokenTable.TokenName[i], TokenTable.TokenValue[i]);
+            }
             return ProcessTable;
         }
     }
@@ -102,21 +104,30 @@ namespace RobinScript
         public List<object> TokenValue = new List<object>();
         public static Tokenizer GetTokenTable(Source Line, List<string> Tokens)
         {
-            Types LastType = Types.Undefined;
-            string LastName = "";
-            object LastValue = "";
             Tokenizer TokenTable = new Tokenizer();
-            for (int i = 0; i < Tokens.Count; i++)
+            for (int i = 0; i < Tokens.Count; i++) {
                 if (Tokens[0] == "fn") {
-                    LastType = Types.FunctionDescribement;
-                    LastName = Tokens[1];
-                    // creare un albero sintattico
-                    for(int j=1;j<Tokens.Count-2;j++)
+                    TokenTable.Add(Types.FunctionDescribement, Tokens[1], (Tokens.Count() == 2) ? false:true); // dove false se non contiene paramentri, al contrario true se li contiene
+                    Tokens = Line.GetWordWrapList("(,)");
+                    for (int j = 1; j < Tokens.Count(); j++) {
+                        TokenTable.Add(Types.FunctionParameter, (Tokens[j].Contains('=')) ? Tokens[j].Split('=')[0].Replace(" ", "") : Tokens[j].Replace(" ", ""), (Tokens[j].Contains('=')) ? Tokens[j].Split('=')[1] : "");   
+                    }
+                    break;
+                } else if (Tokens[0] == "class") {
+                    TokenTable.Add(Types.ClassDescribement, Tokens[1]);
+                    break;
+                } else if (Tokens[i][0] == '$') {
+                    TokenTable.Add(Types.CallingFunction, Tokens[i].Substring(1), (Tokens.Count() == ) ? false : true);
+                    Tokens = Line.GetWordWrapList("(,)");
+                    for (int j = 1; j < Tokens.Count(); j++) {
+                        TokenTable.Add(Types.FunctionParameter, (Tokens[j].Contains('=')) ? Tokens[j].Split('=')[0].Replace(" ", "") : Tokens[j].Replace(" ", ""), (Tokens[j].Contains('=')) ? Tokens[j].Split('=')[1] : "");
+                    }
+                    continue;
                 }
-
+            }
             return TokenTable;
         }
-        public void Add(Types _tokenType, string _tokenName ,object _tokenValue)
+        public void Add(Types _tokenType, string _tokenName, object _tokenValue = null)
         {
             TokenType.Add(_tokenType);
             TokenName.Add(_tokenName);
