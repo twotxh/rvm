@@ -1,4 +1,4 @@
-
+﻿
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -91,25 +91,35 @@ namespace RobinScript
                 }
             }
 
-            foreach (string s in Line.GetWordWrapList(" ( , ) = "))
-                Console.WriteLine(s);
-            //Tokenizer TokenTable = Tokenizer.GetTokenTable(Line, Tokenizer.GetWordWrapList(Line.Value, " "));
+            Tokenizer TokenTable = Tokenizer.GetTokenTable(Line, Line.GetWordWrapList("(,)= "));
             return ProcessTable;
         }
     }
     class Tokenizer
     {
-        public List<Types> TokenType = new List<Types>(); 
-        public List<string> TokenValue = new List<string>();
-        public static Tokenizer GetTokenTable(Source Line, List<string> WordWrapped)
+        public List<Types> TokenType = new List<Types>();
+        public List<string> TokenName = new List<string>();
+        public List<object> TokenValue = new List<object>();
+        public static Tokenizer GetTokenTable(Source Line, List<string> Tokens)
         {
-            Tokenizer TokenTable = new Tokenizer(); // fn main()
-            //List<string> LineTokenized = ;
+            Types LastType = Types.Undefined;
+            string LastName = "";
+            object LastValue = "";
+            Tokenizer TokenTable = new Tokenizer();
+            for (int i = 0; i < Tokens.Count; i++)
+                if (Tokens[0] == "fn") {
+                    LastType = Types.FunctionDescribement;
+                    LastName = Tokens[1];
+                    // creare un albero sintattico
+                    for(int j=1;j<Tokens.Count-2;j++)
+                }
+
             return TokenTable;
         }
-        public void Add(Types _tokenType, string _tokenValue)
+        public void Add(Types _tokenType, string _tokenName ,object _tokenValue)
         {
             TokenType.Add(_tokenType);
+            TokenName.Add(_tokenName);
             TokenValue.Add(_tokenValue);
         }
         public enum Types {
@@ -390,44 +400,29 @@ namespace RobinScript
         }
         public List<string> GetWordWrapList(string PatternToSplit)
         {
-            // cambiare in value
-            List<string> Words = new List<string>();
-            string Word = string.Empty;
+            string result = "";
             bool isInterpolate = false;
-            for (int j = 0; j < PatternToSplit.Length; j++)
-            {
-                // ciclare il pattern e appoggiare il ciclo del testo sul pattern[j]
-                for (int i = 0; i < Value.Length; i++)
-                {
-                    if (isInterpolate)
-                    {
-                        if (Value[i] == '"')
-                        {
-                            Word += '"';
-                            isInterpolate = false;
-                            continue;
-                        }
-                        else
-                        {
-                            Word += Value[i];
-                            continue;
-                        }
-                    }
-                    else
-                    {
-                        if (Value[i] == '"') isInterpolate = true;
-                        else if (PatternToSplit.Contains(Value[i]) && !string.IsNullOrWhiteSpace(Word))
-                        {
-                            Words.Add(Word);
-                            Word = string.Empty;
-                        }
-                        else
-                            Word += Value[i];
-                    }
-                } if (!string.IsNullOrWhiteSpace(Word))
-                    Words.Add(Word);
+            for (int j = 0; j < Value.Length; j++) {
+                if (Value[j] == '"') {
+                    isInterpolate = (!isInterpolate) ? true : false;
+                    result += '"';
+                    continue;
+                }
+                else if (isInterpolate) {
+                    result += Value[j];
+                    continue;
+                }
+                else if (PatternToSplit.Contains(Value[j])) {
+                    result += '⳿';
+                    continue;
+                } else result+=Value[j];
             }
-            return Words;
+            List<string> toReturn = new List<string>();
+            string[] resultSplit = result.Split('⳿');
+            for (int i = 0; i < resultSplit.Count(); i++) {
+                if (!string.IsNullOrWhiteSpace(resultSplit[i])) toReturn.Add(resultSplit[i]);
+            }
+            return toReturn;
         }
         public string ToString()
         {
