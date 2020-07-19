@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 
 namespace RobinScript
 {
+    // creare una classe info con la versione il nome ecc...
     class Program
     {
         static void Main(string[] args)
@@ -21,7 +22,6 @@ namespace RobinScript
                     }
                 default:
                     for (int i = 0; i < args.Count(); i++) {
-                        Console.WriteLine(i);
                         Tools.ExecFile(args[i]);
                         Tools.GetExecuteTime();
                     }break;
@@ -36,6 +36,8 @@ namespace RobinScript
     class Tools
     {
         public static int LineCounter = 0;
+        public static Storage ProcessTable = new Storage();
+        public static Interpreter Robin = new Interpreter();
         public static void ExecLine(string _line, Storage _processTable)
         {
             // fix shell
@@ -43,10 +45,10 @@ namespace RobinScript
             {
                 Source Line = new Source();
                 Line.Value = _line;
+                Line.Value = Line.RemoveComments("//");
                 Source LineEmptyString = new Source();
                 LineEmptyString.Value = _line; LineEmptyString.Value = LineEmptyString.GetEmptyString();
-                Storage ProcessTable = Lexer.GetProcessTable(Line, LineEmptyString, _processTable);
-                Interpreter Robin = new Interpreter();
+                ProcessTable = Lexer.GetProcessTable(Line, LineEmptyString, _processTable);
                 Robin.Run(ProcessTable);
             }
         }
@@ -57,17 +59,17 @@ namespace RobinScript
             Source Line = new Source();
             Source LineEmptyString = new Source();
             Storage ProcessTable = new Storage();
+            Interpreter Robin = new Interpreter();
+            ExecuteTimer.Start();
             for (int i = 0; i < Code.Count(); i++) {
                 LineCounter++;
                 if (!string.IsNullOrWhiteSpace(Code[i])) {
                     Line.Value = Code[i];
+                    Line.Value = Line.RemoveComments("//");
                     LineEmptyString.Value = Line.GetEmptyString();
-                    ProcessTable = Lexer.GetProcessTable(Line, LineEmptyString, ProcessTable);
+                    Robin.Run(Lexer.GetProcessTable(Line, LineEmptyString, ProcessTable));
                 }
             }
-            Interpreter Robin = new Interpreter();
-            ExecuteTimer.Start();
-            Robin.Run(ProcessTable);
             ExecuteTimer.Stop();
         }
         public static void GetExecuteTime()
@@ -78,22 +80,31 @@ namespace RobinScript
     }
     class Lexer
     {
+
         private static bool isIndentArea = false; private static Process.Type _LastProcessType = Process.Type.Null; private static string _LastProcessName = string.Empty; private static string _LastProcessNameArg = string.Empty; private static StringBuilder _LastProcessArg = new StringBuilder();
         public static Storage GetProcessTable(Source Line, Source LineEmptyString, Storage ProcessTable)
         {
-            if (isIndentArea) {
-                if (Line.Pop(" ") == "}") {
-                    isIndentArea = false;
-                    ProcessTable.AddToProcessTable(_LastProcessType, _LastProcessName, _LastProcessNameArg, _LastProcessArg);
-                }
-                else {
-                    _LastProcessArg.AppendLine(Line.Value);
-                }
-            }
             Tokenizer TokenTable = Tokenizer.GetTokenTable(Line, Line.GetWordWrapList("(,) "));
             for (int i = 0; i < TokenTable.TokenName.Count; i++) {
                 Console.WriteLine("Type: {0}, Name: {1}, Value: {2}", TokenTable.TokenType[i], TokenTable.TokenName[i], TokenTable.TokenValue[i]);
+
+
+                if (isIndentArea) {
+                    if (TokenTable.TokenType[i] == Tokenizer.Types.Dedent) {
+                        isIndentArea = false;
+                        ProcessTable.AddToProcessTable(_LastProcessType, _LastProcessName, _LastProcessNameArg, _LastProcessArg);
+                    } else {
+                        _LastProcessArg.AppendLine(Line.Value);
+                    }
+                }
+                if (TokenTable.TokenType[i] == Tokenizer.Types.Indent) {
+                    isIndentArea = true;
+                }
             }
+
+
+
+
             return ProcessTable;
         }
     }
@@ -110,19 +121,22 @@ namespace RobinScript
                     TokenTable.Add(Types.FunctionDescribement, Tokens[1], (Tokens.Count() == 2) ? false:true); // dove false se non contiene paramentri, al contrario true se li contiene
                     Tokens = Line.GetWordWrapList("(,)");
                     for (int j = 1; j < Tokens.Count(); j++) {
-                        TokenTable.Add(Types.FunctionParameter, (Tokens[j].Contains('=')) ? Tokens[j].Split('=')[0].Replace(" ", "") : Tokens[j].Replace(" ", ""), (Tokens[j].Contains('=')) ? Tokens[j].Split('=')[1] : "");   
+                        TokenTable.Add(Types.FunctionParameter, (Tokens[j].Contains('=')) ? Tokens[j].Split('=')[0].Replace(" ", "") : Tokens[j].Replace(" ", ""), (Tokens[j].Contains('=')) ? Tokens[j].Split('=')[1] : "");
                     }
                     break;
                 } else if (Tokens[0] == "class") {
                     TokenTable.Add(Types.ClassDescribement, Tokens[1]);
                     break;
                 } else if (Tokens[i][0] == '$') {
-                    TokenTable.Add(Types.CallingFunction, Tokens[i].Substring(1), (Tokens.Count() == ) ? false : true);
+                    TokenTable.Add(Types.CallingFunction, Tokens[i].Substring(1), (Line.GetWordWrapList("()").Count() < 3) ? false : true);
                     Tokens = Line.GetWordWrapList("(,)");
                     for (int j = 1; j < Tokens.Count(); j++) {
                         TokenTable.Add(Types.FunctionParameter, (Tokens[j].Contains('=')) ? Tokens[j].Split('=')[0].Replace(" ", "") : Tokens[j].Replace(" ", ""), (Tokens[j].Contains('=')) ? Tokens[j].Split('=')[1] : "");
                     }
-                    continue;
+                } if (Tokens[i][0] == '{' || Tokens[i] == "{") {
+                    TokenTable.Add(Types.Indent, string.Empty, string.Empty);
+                } if (Tokens[i][0] == '}' || Tokens[i] == "}") {
+                    TokenTable.Add(Types.Dedent, string.Empty, string.Empty);
                 }
             }
             return TokenTable;
@@ -134,7 +148,7 @@ namespace RobinScript
             TokenValue.Add(_tokenValue);
         }
         public enum Types {
-            Undefined,
+            Undefined = 0,
             FunctionDescribement,
             CallingFunction,
             ClassDescribement,
@@ -146,6 +160,8 @@ namespace RobinScript
             VariableAssigment,
             CallingVariable,
             Use,
+            Indent,
+            Dedent,
         }
     }
     class Interpreter
@@ -155,7 +171,7 @@ namespace RobinScript
             Storage.Program Ram = new Storage.Program();
             BuiltIn.InitializeComponent(Ram);
             for (int i = 0; i <  ProcessTable.ProcessCounter; i++) {
-                Process.RunProcess(ProcessTable.GetProcessType()[i], ProcessTable.GetProcessName()[i], ProcessTable.GetProcessNameArg()[i], ProcessTable.GetProcessArg()[i], Ram);
+                Process.RunProcess(ProcessTable.GetProcessType()[i], ProcessTable.GetProcessName()[i], ProcessTable.GetProcessArg()[i], Ram);
             }
         }
     }
@@ -174,13 +190,13 @@ namespace RobinScript
                 for (int i = 0; i < spam; i++) { Console.WriteLine(arg); }
             }
         }
-        public static void RunProcess(Type ProcessType, string ProcessName, string ProcessNameArg, object ProcessArg, Storage.Program Ram)
+        public static ProcessIt[] ProcessIndex = {Console.Write, Console.WriteLine};
+        public static void RunProcess(Type ProcessType, string ProcessName, object ProcessArg, Storage.Program Ram)
         {
-            switch (ProcessType) {
-                case Type.Variable: Ram.SetVariable(ProcessName, ProcessArg); break;
-                case Type.Print: Runtime.Print(ProcessArg.ToString()); break;
-            }
+            ProcessIt run = ProcessIndex[Convert.ToInt32(ProcessType)];
+            run(ProcessName, ProcessArg, Ram);
         }
+        public delegate void ProcessIt(string ProcessName, object ProcessArg, Storage.Program Ram);
         public enum Type {
             Null,
             Function,
@@ -213,8 +229,8 @@ namespace RobinScript
             EncryptFile,
             DecryptFile,
             RenameFile,
-            Print, // print
-            Println, // print + \n
+            Print = 0, // print
+            Println = 1, // print + \n
             Printlns, // spam string print +\n 
             Prints, // spam string: param -> ("string", 10) where int is the time to spam "string"
             Printf, // print a format string
