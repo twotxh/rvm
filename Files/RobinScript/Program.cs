@@ -1,17 +1,16 @@
-﻿
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 
 namespace RobinScript
 {
-    // creare una classe info con la versione il nome ecc...
+    // RobinScript 
     class Program
     {
         static void Main(string[] args)
         {
+            Console.Title = "RobinScript";
             switch (args.Count())
             {
                 case 0:
@@ -84,7 +83,7 @@ namespace RobinScript
         private static bool isIndentArea = false; private static Process.Type _LastProcessType = Process.Type.Null; private static string _LastProcessName = string.Empty; private static string _LastProcessNameArg = string.Empty; private static StringBuilder _LastProcessArg = new StringBuilder();
         public static Storage GetProcessTable(Source Line, Source LineEmptyString, Storage ProcessTable)
         {
-            Tokenizer TokenTable = Tokenizer.GetTokenTable(Line, Line.GetWordWrapList("(,) "));
+            Tokenizer TokenTable = Tokenizer.GetTokenTable(Line, Line.GetWordWrapList(", "));
             for (int i = 0; i < TokenTable.TokenName.Count; i++) {
                 Console.WriteLine("Type: {0}, Name: {1}, Value: {2}", TokenTable.TokenType[i], TokenTable.TokenName[i], TokenTable.TokenValue[i]);
 
@@ -118,7 +117,7 @@ namespace RobinScript
             Tokenizer TokenTable = new Tokenizer();
             for (int i = 0; i < Tokens.Count; i++) {
                 if (Tokens[0] == "fn") {
-                    TokenTable.Add(Types.FunctionDescribement, Tokens[1], (Tokens.Count() == 2) ? false:true); // dove false se non contiene paramentri, al contrario true se li contiene
+                    TokenTable.Add(Types.FunctionDescribement, (Tokens[1].Contains('(')) ? Tokens[1].Substring(0, Tokens[1].IndexOf('(')) : Tokens[1], (Tokens.Count() == 2) ? false:true); // dove false se non contiene paramentri, al contrario true se li contiene
                     Tokens = Line.GetWordWrapList("(,)");
                     for (int j = 1; j < Tokens.Count(); j++) {
                         TokenTable.Add(Types.FunctionParameter, (Tokens[j].Contains('=')) ? Tokens[j].Split('=')[0].Replace(" ", "") : Tokens[j].Replace(" ", ""), (Tokens[j].Contains('=')) ? Tokens[j].Split('=')[1] : "");
@@ -128,14 +127,14 @@ namespace RobinScript
                     TokenTable.Add(Types.ClassDescribement, Tokens[1]);
                     break;
                 } else if (Tokens[i][0] == '$') {
-                    TokenTable.Add(Types.CallingFunction, Tokens[i].Substring(1), (Line.GetWordWrapList("()").Count() < 3) ? false : true);
+                    TokenTable.Add(Types.CallingFunction, (Tokens[i].Contains('(')) ? Tokens[i].Substring(1, Tokens[i].IndexOf('(')-1) : Tokens[i].Substring(1), (Line.GetWordWrapList("()").Count() < 3) ? false : true);
                     Tokens = Line.GetWordWrapList("(,)");
                     for (int j = 1; j < Tokens.Count(); j++) {
                         TokenTable.Add(Types.FunctionParameter, (Tokens[j].Contains('=')) ? Tokens[j].Split('=')[0].Replace(" ", "") : Tokens[j].Replace(" ", ""), (Tokens[j].Contains('=')) ? Tokens[j].Split('=')[1] : "");
                     }
-                } if (Tokens[i][0] == '{' || Tokens[i] == "{") {
+                } else if (Tokens[i][0] == '{') {
                     TokenTable.Add(Types.Indent, string.Empty, string.Empty);
-                } if (Tokens[i][0] == '}' || Tokens[i] == "}") {
+                } else if (Tokens[i][0] == '}') {
                     TokenTable.Add(Types.Dedent, string.Empty, string.Empty);
                 }
             }

@@ -2,8 +2,8 @@
 - Author: Carpal
 - Name: RobinScript
 - Date: 14/07/20 - 10:15
-- Common Extention: .rbs <br>
-***A fast Interpreted language, syntactically designed by me. Robin Script (Ext: .rbs ). This project will be written in C#.Net, in a VisualStudio solution (Ext: .sln), that can be downloaded and edited by anyone. The commits will not be accepted, but I will gladly watch them.***
+- Common Extention: .rsc <br>
+***A fast Interpreted language, syntactically designed by me. Robin Script (Ext: .rsc ). This project will be written in C#.Net, in a VisualStudio solution (Ext: .sln), that can be downloaded and edited by anyone. The commits will not be accepted, but I will gladly watch them.***
 _________________________________
 # How To Use
 - cmd: `robin file.rbs`
@@ -35,12 +35,21 @@ ____
 
 ```
 class Program {
-  fn main() {
-    $input(x)
+  fn main {
+    x = $input
     $print(x)
   }
 }
-c = Init(Program.main())
+c = $init(Program.main)
+```
+____
+```
+fn noParamFunc
+{
+    return false
+} if $noParamFunc {
+    $print("Parameterless functions don't need brackets '(', ')'")
+}
 ```
 # Icon: Logo
 ![RobinScript Logo](/Logos/RobinLogo.ico) <br>

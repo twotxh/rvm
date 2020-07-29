@@ -1,0 +1,2 @@
+$print("ciao")
+x = $input()
