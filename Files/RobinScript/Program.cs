@@ -86,7 +86,7 @@ namespace RobinScript
             //Tokenizer TokenTable = Tokenizer.GetTokenTable(Line, Line.GetWordWrapList(", "));
             Tokenizer TokenTable = Tokenizer.GetTokenTable(Line);
             for (int i = 0; i < TokenTable.TokenName.Count; i++) {
-                Console.WriteLine("Type: {0}, Name: {1}, Value: {2}", TokenTable.TokenType[i], TokenTable.TokenName[i], TokenTable.TokenValue[i]);
+                Console.WriteLine("Type: {0} Name: {1} Value: {2}", TokenTable.TokenType[i], TokenTable.TokenName[i], TokenTable.TokenValue[i]);
 
 
                 if (isIndentArea) {
@@ -150,16 +150,67 @@ namespace RobinScript
             return TokenTable;
         }*/
         // new tokenizer
+        private static string word = "";
         public static Tokenizer GetTokenTable(Source line)
         {
             Tokenizer TokensTable = new Tokenizer();
+            word = "";
+            bool isInterpolate = false;
 
+            for (int index = 0; index < line.Value.Length; index++) {
+                char term = line.Value[index];
+                word += term;
 
+                if (term == '"') isInterpolate = (isInterpolate) ? false : true;
+                if (isInterpolate) continue;
+                switch (term) {
 
+                    case ' ':
+                        if (toKey() == "fn") {
+                            TokensTable.Add(Types.FunctionDescribement, line.GetWordWrapList(" ")[1], (line.Value.Split(' ').Count() > 2) ? true : false);
+                            for (int i = 2; i < line.GetWordWrapList(" ").Count(); i++)
+                                TokensTable.Add(Types.FunctionParameter, line.GetWordWrapList(" ")[i]);
+                        }
+                        else if (toKey() == "class")
+                            TokensTable.Add(Types.ClassDescribement, line.Value.Split(' ')[1]);
+                        else if (toKey() == "load")
+                            for (int i = 1; i < line.Value.Split(' ').Count(); i++)
+                                TokensTable.Add(Types.Load, line.Value.Split(' ')[i]);
+                        // resetto word
+                        word = "";
+                        break;
+                    case '$':
+                        // completare il token adding di 'calling function'
+                        TokensTable.Add(Types.CallingFunction, ); 
+                        break;
+                    case ')':
+                        // creare espressioni per le funzioni che ritornano valori
+                        break;
+                    case '(':
+                        // creare espressioni per le funzioni che ritornano valori
+                        break;
+                    case '=':
+                        // configurare un opzione di riconoscimento condizioni, evitare di confondere '=' con '==' e '!=', magari usando operatori condizionali quali 'is' 'not' 'in' '>' '<'
+                        break;
+                    default:
+                        // else
+                        break;
+                }
+
+            }
 
             return TokensTable;
         }
-        
+
+        private static string toKey(string s)
+        {
+            return s.Replace(" ", "");
+        }
+        private static string toKey()
+        {
+            return word.Replace(" ", "");
+        }
+
         public void Add(Types _tokenType, string _tokenName, object _tokenValue = null)
         {
             TokenType.Add(_tokenType);
