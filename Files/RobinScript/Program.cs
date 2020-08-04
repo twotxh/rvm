@@ -80,10 +80,9 @@ namespace RobinScript
     class Lexer
     {
 
-        private static bool isIndentArea = false; private static Process.Type _LastProcessType = Process.Type.Null; private static string _LastProcessName = string.Empty; private static string _LastProcessNameArg = string.Empty; private static StringBuilder _LastProcessArg = new StringBuilder();
+        public static bool isIndentArea = false; private static Process.Type _LastProcessType = Process.Type.Null; private static string _LastProcessName = string.Empty; private static string _LastProcessNameArg = string.Empty; private static StringBuilder _LastProcessArg = new StringBuilder();
         public static Storage GetProcessTable(Source Line, Source LineEmptyString, Storage ProcessTable)
         {
-            //Tokenizer TokenTable = Tokenizer.GetTokenTable(Line, Line.GetWordWrapList(", "));
             Tokenizer TokenTable = Tokenizer.GetTokenTable(Line);
             for (int i = 0; i < TokenTable.TokenName.Count; i++) {
                 Console.WriteLine("Type: {0} Name: {1} Value: {2}", TokenTable.TokenType[i], TokenTable.TokenName[i], TokenTable.TokenValue[i]);
@@ -171,9 +170,12 @@ namespace RobinScript
                             TokensTable.Add(Types.FunctionDescribement, line.GetWordWrapList(" ")[1], (line.Value.Split(' ').Count() > 2) ? true : false);
                             for (int i = 2; i < line.GetWordWrapList(" ").Count(); i++)
                                 TokensTable.Add(Types.FunctionParameter, line.GetWordWrapList(" ")[i]);
+                            Lexer.isIndentArea = true;
                         }
-                        else if (toKey() == "class")
+                        else if (toKey() == "class") {
                             TokensTable.Add(Types.ClassDescribement, line.Value.Split(' ')[1]);
+                            Lexer.isIndentArea = true;
+                        }
                         else if (toKey() == "load")
                             for (int i = 1; i < line.Value.Split(' ').Count(); i++)
                                 TokensTable.Add(Types.Load, line.Value.Split(' ')[i]);
@@ -206,7 +208,6 @@ namespace RobinScript
                                 TokensTable.Add(Types.FunctionParameter, paramsToTake[i]);
                             }
                         }
-
                             break;
                     case ')':
                         if (isParamArea) isParamArea = false;
@@ -230,7 +231,9 @@ namespace RobinScript
                         // sistema di espressioni
                         break;
                     default:
-                        // else
+                        if (toKey(word) == "end") {
+                            Lexer.isIndentArea = false;
+                        }
                         break;
                 }
 
