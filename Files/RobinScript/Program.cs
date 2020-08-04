@@ -156,6 +156,7 @@ namespace RobinScript
             Tokenizer TokensTable = new Tokenizer();
             word = "";
             bool isInterpolate = false;
+            bool isParamArea = false;
 
             for (int index = 0; index < line.Value.Length; index++) {
                 char term = line.Value[index];
@@ -176,21 +177,57 @@ namespace RobinScript
                         else if (toKey() == "load")
                             for (int i = 1; i < line.Value.Split(' ').Count(); i++)
                                 TokensTable.Add(Types.Load, line.Value.Split(' ')[i]);
-                        // resetto word
-                        word = "";
+                        else {
+                            if (isParamArea) {
+                                if (toKey(word).Replace("(", "")[0] != '$')
+                                    TokensTable.Add(Types.FunctionParameter, word);
+                                word = "";
+                            }
+                        }
                         break;
                     case '$':
-                        // completare il token adding di 'calling function'
-                        TokensTable.Add(Types.CallingFunction, ); 
-                        break;
+                        string textToTake = line.Value.Substring(index);
+                        if (Source.GetEmptyStringStatic(textToTake).Contains(')')) {
+                            isParamArea = true;
+                            try {
+                                TokensTable.Add(Types.CallingFunction, textToTake.Split(' ')[0].Substring(1));
+                            } catch (IndexOutOfRangeException) {
+                                TokensTable.Add(Types.CallingFunction, textToTake.Substring(1, textToTake.IndexOf(')')));
+                            }
+
+                        } else {
+                            try {
+                                TokensTable.Add(Types.CallingFunction, textToTake.Split(' ')[0].Substring(1));
+                            } catch (IndexOutOfRangeException) {
+                                TokensTable.Add(Types.CallingFunction, toKey(textToTake).Substring(1));
+                            }
+                            List<string> paramsToTake = Source.GetWordWrapListStatic(textToTake, " ");
+                            for (int i = 1; i < paramsToTake.Count(); i++) {
+                                TokensTable.Add(Types.FunctionParameter, paramsToTake[i]);
+                            }
+                        }
+
+                            break;
                     case ')':
-                        // creare espressioni per le funzioni che ritornano valori
+                        if (isParamArea) isParamArea = false;
                         break;
                     case '(':
-                        // creare espressioni per le funzioni che ritornano valori
                         break;
                     case '=':
-                        // configurare un opzione di riconoscimento condizioni, evitare di confondere '=' con '==' e '!=', magari usando operatori condizionali quali 'is' 'not' 'in' '>' '<'
+                        // configurare un opzione di riconoscimento condizioni, evitare di confondere '=' con '==' e '!=', magari usando operatori condizionali quali 'is' 'not' 'in' 'than'
+                        TokensTable.Add(Types.VariableAssigment, toKey(word.Replace("=", "")), line.Value.Substring(line.Value.IndexOf('=')+1));
+                        break;
+                    case '+':
+                        // sistema di espressioni
+                        break;
+                    case '-':
+                        // sistema di espressioni
+                        break;
+                    case '*':
+                        // sistema di espressioni
+                        break;
+                    case '/':
+                        // sistema di espressioni
                         break;
                     default:
                         // else
@@ -454,6 +491,22 @@ namespace RobinScript
             }
             return toReturn;
         }
+        public static string GetEmptyStringStatic(string s)
+        {
+            string toReturn = "";
+            bool isInterpolate = false;
+            foreach (char chr in s) {
+                if (chr == '"') {
+                    toReturn += '"';
+                    isInterpolate = (isInterpolate) ? false : true;
+                } else if (!isInterpolate)
+                    toReturn += chr;
+                else
+                    toReturn += ' ';
+
+            }
+            return toReturn;
+        }
         public string Pop(string str)
         {
             return Value.Replace(str, string.Empty);
@@ -523,9 +576,29 @@ namespace RobinScript
             }
             return toReturn;
         }
-        public string ToString()
+        public static List<string> GetWordWrapListStatic(string s, string PatternToSplit)
         {
-            return Value;
+            string result = "";
+            bool isInterpolate = false;
+            for (int j = 0; j < s.Length; j++) {
+                if (s[j] == '"') {
+                    isInterpolate = (!isInterpolate) ? true : false;
+                    result += '"';
+                    continue;
+                } else if (isInterpolate) {
+                    result += s[j];
+                    continue;
+                } else if (PatternToSplit.Contains(s[j])) {
+                    result += '⳿';
+                    continue;
+                } else result += s[j];
+            }
+            List<string> toReturn = new List<string>();
+            string[] resultSplit = result.Split('⳿');
+            for (int i = 0; i < resultSplit.Count(); i++) {
+                if (!string.IsNullOrWhiteSpace(resultSplit[i])) toReturn.Add(resultSplit[i]);
+            }
+            return toReturn;
         }
     }
     class Debuger
