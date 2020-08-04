@@ -83,7 +83,8 @@ namespace RobinScript
         private static bool isIndentArea = false; private static Process.Type _LastProcessType = Process.Type.Null; private static string _LastProcessName = string.Empty; private static string _LastProcessNameArg = string.Empty; private static StringBuilder _LastProcessArg = new StringBuilder();
         public static Storage GetProcessTable(Source Line, Source LineEmptyString, Storage ProcessTable)
         {
-            Tokenizer TokenTable = Tokenizer.GetTokenTable(Line, Line.GetWordWrapList(", "));
+            //Tokenizer TokenTable = Tokenizer.GetTokenTable(Line, Line.GetWordWrapList(", "));
+            Tokenizer TokenTable = Tokenizer.GetTokenTable(Line);
             for (int i = 0; i < TokenTable.TokenName.Count; i++) {
                 Console.WriteLine("Type: {0}, Name: {1}, Value: {2}", TokenTable.TokenType[i], TokenTable.TokenName[i], TokenTable.TokenValue[i]);
 
@@ -112,34 +113,53 @@ namespace RobinScript
         public List<Types> TokenType = new List<Types>();
         public List<string> TokenName = new List<string>();
         public List<object> TokenValue = new List<object>();
-        public static Tokenizer GetTokenTable(Source Line, List<string> Tokens)
+        // old tokenizer
+        /*public static Tokenizer GetTokenTable(Source Line, List<string> Tokens)
         {
             Tokenizer TokenTable = new Tokenizer();
             for (int i = 0; i < Tokens.Count; i++) {
                 if (Tokens[0] == "fn") {
-                    TokenTable.Add(Types.FunctionDescribement, (Tokens[1].Contains('(')) ? Tokens[1].Substring(0, Tokens[1].IndexOf('(')) : Tokens[1], (Tokens.Count() == 2) ? false:true); // dove false se non contiene paramentri, al contrario true se li contiene
-                    Tokens = Line.GetWordWrapList("(,)");
+                    TokenTable.Add(Types.FunctionDescribement, (Tokens[1].Contains('(')) ? Tokens[1].Substring(0, Tokens[1].IndexOf('(')) : Tokens[1], (Tokens[1].Contains('(')) ? true : false); // dove false se non contiene paramentri, al contrario true se li contiene
+                    Tokens = Line.GetWordWrapList("(,");
                     for (int j = 1; j < Tokens.Count(); j++) {
+                        if (Tokens[j].Contains(')')) {
+                            TokenTable.Add(Types.FunctionParameter, (Tokens[j].Contains('=')) ? Tokens[j].Split('=')[0].Replace(" ", "") : Tokens[j].Substring(0, Tokens[j].LastIndexOf(')')).Replace(" ", ""), (Tokens[j].Contains('=')) ? Tokens[j].Split('=')[1].Substring(0, Tokens[j].Split('=')[1].LastIndexOf(")")) : "");
+                            break;
+                        }
                         TokenTable.Add(Types.FunctionParameter, (Tokens[j].Contains('=')) ? Tokens[j].Split('=')[0].Replace(" ", "") : Tokens[j].Replace(" ", ""), (Tokens[j].Contains('=')) ? Tokens[j].Split('=')[1] : "");
                     }
                     break;
-                } else if (Tokens[0] == "class") {
+                } if (Tokens[0] == "class") {
                     TokenTable.Add(Types.ClassDescribement, Tokens[1]);
                     break;
-                } else if (Tokens[i][0] == '$') {
-                    TokenTable.Add(Types.CallingFunction, (Tokens[i].Contains('(')) ? Tokens[i].Substring(1, Tokens[i].IndexOf('(')-1) : Tokens[i].Substring(1), (Line.GetWordWrapList("()").Count() < 3) ? false : true);
-                    Tokens = Line.GetWordWrapList("(,)");
+                } if (Tokens[i][0] == '$') {
+                    TokenTable.Add(Types.CallingFunction, (Tokens[i].Contains('(')) ? Tokens[i].Substring(1, Tokens[i].IndexOf('(') - 1) : Tokens[i].Substring(1), (Line.GetWordWrapList("()").Count() < 3) ? false : true);
+                    Tokens = Line.GetWordWrapList("(,");
                     for (int j = 1; j < Tokens.Count(); j++) {
+                        if (Tokens[j].Contains(')')) {
+                            TokenTable.Add(Types.FunctionParameter, (Tokens[j].Contains('=')) ? Tokens[j].Split('=')[0].Replace(" ", "") : Tokens[j].Substring(0, Tokens[j].LastIndexOf(')')).Replace(" ", ""), (Tokens[j].Contains('=')) ? Tokens[j].Split('=')[1].Substring(0, Tokens[j].Split('=')[1].LastIndexOf(")")) : "");
+                            break;
+                        }
                         TokenTable.Add(Types.FunctionParameter, (Tokens[j].Contains('=')) ? Tokens[j].Split('=')[0].Replace(" ", "") : Tokens[j].Replace(" ", ""), (Tokens[j].Contains('=')) ? Tokens[j].Split('=')[1] : "");
                     }
-                } else if (Tokens[i][0] == '{') {
+                } if (Tokens[i][0] == '{')
                     TokenTable.Add(Types.Indent, string.Empty, string.Empty);
-                } else if (Tokens[i][0] == '}') {
+                if (Tokens[i][0] == '}')
                     TokenTable.Add(Types.Dedent, string.Empty, string.Empty);
-                }
             }
             return TokenTable;
+        }*/
+        // new tokenizer
+        public static Tokenizer GetTokenTable(Source line)
+        {
+            Tokenizer TokensTable = new Tokenizer();
+
+
+
+
+            return TokensTable;
         }
+        
         public void Add(Types _tokenType, string _tokenName, object _tokenValue = null)
         {
             TokenType.Add(_tokenType);
@@ -161,6 +181,8 @@ namespace RobinScript
             Use,
             Indent,
             Dedent,
+            OpenBrack,
+            CloseBrack,
         }
     }
     class Interpreter
