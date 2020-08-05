@@ -1,1 +1,3 @@
-$printf "numeri: {3}" e e e 10 
+fn add n1 n2
+	$println "ciao"
+end
