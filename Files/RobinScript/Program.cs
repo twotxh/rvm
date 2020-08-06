@@ -19,15 +19,15 @@ namespace RobinScript
     enum ProcessTypes
     {
         Null,
-        Function,
-        Class,
+        NewFunction,
+        NewClass,
         For,
         While,
         Loop,
         If,
         Elseif,
         Else,
-        Variable,
+        SetVariable,
         CallFunction,
         CallVariable,
         CallClass,
@@ -77,6 +77,10 @@ namespace RobinScript
         Dedent,
         OpenBrack,
         CloseBrack,
+        OpAdd,
+        OpSub,
+        OpSplit,
+        OpMolt,
         Eol,
     }
     class Program
@@ -88,14 +92,13 @@ namespace RobinScript
             {
                 case 0:
                     Welcome();
-                    Storage.Program Ram = new Storage.Program();
                     while (true) {
                         Console.Write("\n:: ");
-                        try { Ram = Tools.ExecLine(Console.ReadLine(), Ram); } catch (Crash) { }
+                        try { Tools.ExecLine(Console.ReadLine()); } catch (Crash) { }
                     }
                 default:
                     for (int i = 0; i < args.Count(); i++) {
-                        try { Tools.ExecFile(args[i]); } catch (Crash) { Console.ReadKey(); continue; }
+                        try { Tools.ExecFile(args[i]); Storage.Reset(); } catch (Crash) { Console.ReadKey(); continue; }
                         Tools.GetExecuteTime();
                     }break;
             }
@@ -110,35 +113,21 @@ namespace RobinScript
     {
         public static int LineCounter = 0;
         public static string CurrentString = "";
-        public static Storage.Program ExecLine(string _line, Storage.Program Ram)
+        public static void ExecLine(string _line)
         {
             CurrentString = _line;
             if (!string.IsNullOrWhiteSpace(_line))
-            {
-                Source Line = new Source();
-                Line.Value = _line;
-                Line.Value = Line.RemoveComments("//");
-                Source LineEmptyString = new Source();
-                LineEmptyString.Value = _line; LineEmptyString.Value = LineEmptyString.GetEmptyString();
-                return Interpreter.Run(Lexer.GetProcessTable(Line, LineEmptyString), Ram);
-            }
-            return Ram;
+                Interpreter.Run(Lexer.GetProcessTable(new Source() { Value = Source.RemoveCommentsStatic(_line) }, new Source() { Value = Source.GetEmptyStringStatic(Source.RemoveCommentsStatic(_line)) }));
         }
         private static System.Diagnostics.Stopwatch ExecuteTimer = new System.Diagnostics.Stopwatch();
         public static void ExecFile(string Path)
         {
             string[] Code = System.IO.File.ReadAllLines(Path);
-            Source Line = new Source();
-            Source LineEmptyString = new Source();
-            Storage.Program Ram = new Storage.Program();
             ExecuteTimer.Start();
             for (int i = 0; i < Code.Count(); i++) {
                 CurrentString = Code[i];
                 if (!string.IsNullOrWhiteSpace(Code[i])) {
-                    Line.Value = Code[i];
-                    Line.Value = Line.RemoveComments("//");
-                    LineEmptyString.Value = Line.GetEmptyString();
-                    Ram = Interpreter.Run(Lexer.GetProcessTable(Line, LineEmptyString), Ram);
+                    Interpreter.Run(Lexer.GetProcessTable(new Source() { Value = Source.RemoveCommentsStatic(Code[i]) }, new Source() { Value = Source.GetEmptyStringStatic(Source.RemoveCommentsStatic(Code[i])) }));
                 }
                 LineCounter++;
             }
@@ -201,7 +190,7 @@ namespace RobinScript
                                 else
                                     break;
                             }
-                            ProcessTable.Add(ProcessTypes.CallFunction, parameters);
+                            ProcessTable.Add(ProcessTypes.CallFunction, parameters, TokenTable.TokenName[index]);
                         }
                         break;
                     case TokenTypes.ClassDescribement:
@@ -358,7 +347,7 @@ namespace RobinScript
     }
     class Interpreter
     {
-        public static Storage.Program Run(ProcessTable ProcessTable, Storage.Program Ram)
+        public static void Run(ProcessTable ProcessTable)
         {
             ProcessTypes ProcessType = ProcessTypes.Null;
             try {
@@ -390,14 +379,13 @@ namespace RobinScript
                     break;
                 case ProcessTypes.CallFunction:
                     // configurare un sistema di assegnamento e corrispondenza parametri funzione
-                    Ram.GetFunction(ProcessTable.OptionalProcessAttribute, ProcessTable.ProcessArgument);
+                    Storage.GetFunction(ProcessTable.OptionalProcessAttribute);
                     break;
                 default:
                     Debuger.Except("Invalid istruction!", "Check the documentation to solve the problem");
                     break;
             }
-            Finish:
-            return Ram;
+            Finish:;
         }
     }
     class ProcessTable
@@ -414,61 +402,93 @@ namespace RobinScript
     }
     class Storage
     {
-        public class Program
+        // memory
+        static private Dictionary<string, object> Variables = new Dictionary<string, object>();
+        static private Dictionary<string, Source> Functions = new Dictionary<string, Source>();
+        static private Dictionary<string, Source> Classes = new Dictionary<string, Source>();
+        // get
+        static public string GetVariable(string name)
         {
-            // memory
-            private Dictionary<string, object> Variables = new Dictionary<string, object>();
-            private Dictionary<Tuple<string, List<string>>, Source> Functions = new Dictionary<Tuple<string, List<string>>, Source>();
-            private Dictionary<string, Source> Classes = new Dictionary<string, Source>();
-            // get
-            public string GetVariable(string name)
-            {
-                if (Variables.ContainsKey(name))
-                    return Variables[name].ToString();
-                else
-                    return null;
-            }
-            public Source GetFunction(string name, List<string> param)
-            {
-                if (Functions.ContainsKey(new Tuple<string, string>(name, param)))
-                    return Functions[new Tuple<string, string>(name, param)].ToString();
-                Debuger.Except($"'{name}' function does not definied jet!", $"Check the function name");
+            if (Variables.ContainsKey(name))
+                return Variables[name].ToString();
+            else
+                Debuger.Except($"'{name}' is not definied yet!", $"Define your variable, Example: '{name} = 5' where '5' is the value of '{name}'");
+            return null;
+        }
+        static public Source GetFunction(string name)
+        {
+            if (Functions.ContainsKey(name))
+                return Functions[name];
+            Debuger.Except($"'{name}' function does not definied jet!", "Check the function name");
+            return null;
+        }
+        static public Source GetClass(string name)
+        {
+            if (Classes.ContainsKey(name))
+                return Classes[name];
+            else
                 return null;
+        }
+        // set or init
+        [Obsolete] static public void SetVariable(string key, object value)
+        {
+            if (!Variables.ContainsKey(key))
+                Variables.Add(key, value);
+            else
+                Variables[key] = value;
+        }
+        static public void NewFunction(string key, string param, Source value)
+        {
+            if (!Functions.ContainsKey(key))
+                Functions.Add(key, value);
+            else
+                Debuger.Except($"'{key}' function exists yet!", $"Try to rename it, example: '{key}NewFunction'");
+        }
+        static public void NewClass(string key, Source value)
+        {
+            if (!Classes.ContainsKey(key))
+                Classes.Add(key, value);
+            else
+                throw new Exception("'" + key + "' already exists!");
+        }
+        static public void Reset()
+        {
+            Variables.Clear();
+            Functions.Clear();
+            Classes.Clear();
+        }
+
+        public class Variable
+        {
+            enum VariableType {
+                Function,
+                Variable,
+                Class,
+                Const_Int,
+                Const_String,
+                Const_Bool,
+                Const_Float,
             }
-            public Source GetClass(string name)
+            public Variable(List<ProcessTypes> forPredictValueType, string name, object value)
             {
-                if (Classes.ContainsKey(name))
-                    return Classes[name].ToString();
-                else
-                    return null;
-            }
-            // set or init
-            public void SetVariable(string key, object value)
-            {
-                if (!Variables.ContainsKey(key))
-                    Variables.Add(key, value);
-                else
-                    Variables[key] = value;
-            }
-            public void InitFunction(string key, List<string> param, Source value)
-            {
-                if (!Functions.ContainsKey(new Tuple<string, List<string>>(key, param)))
-                    Functions.Add(new Tuple<string, List<string>>(key, param), value);
-                else
-                    Debuger.Except($"'{key}' function exists jet!", $"Try to rename it, example: '{key}NewFunction'");
-            }
-            public void InitClass(string key, Source value)
-            {
-                if (!Classes.ContainsKey(key))
-                    Classes.Add(key, value);
-                else
-                    throw new Exception("'" + key + "' already exists!");
+                VariableType type = new VariableType();
+                for (int i = 0; i < forPredictValueType.Count(); i++) {
+                    if (forPredictValueType[i] == ProcessTypes.SetVariable)
+                        continue;
+                    else if (forPredictValueType[i] == ProcessTypes.CallFunction) {
+                         
+                    } else {
+
+                    }
+                }
+
+                SetVariable(name, value);
             }
         }
     }
     class Source
     {
-        public string Value = "";
+        public string Value { get; set; } = "";
         public string GetEmptyString()
         {
             string toReturn = "";
@@ -545,6 +565,22 @@ namespace RobinScript
             }
             return result;
         }
+        public static string RemoveCommentsStatic (string line)
+        {
+            string result = "";
+            bool isInterpolate = false;
+            for (int i = 0; i < line.Length; i++) {
+                if (line[i] == '"') {
+                    isInterpolate = (!isInterpolate) ? true : false;
+                    result += '"';
+                } else if (line[i] == '/' && line[i + 1] == '/' && !isInterpolate) {
+                    break;
+                } else {
+                    result += line[i];
+                }
+            }
+            return result;
+        }
         public List<string> GetWordWrapList(string PatternToSplit)
         {
             string result = "";
@@ -599,9 +635,6 @@ namespace RobinScript
     class Debuger
     {
         public static void print(string toPrint, object arg0 = null, object arg1 = null, object arg2 = null, object arg3 = null) { Console.WriteLine(toPrint + ' ' + arg0 + ' ' + arg1 + ' ' + arg2 + ' ' + arg3); }
-        public void Debug(string line)
-        {
-        }
         public static void Except(string error, string tip)
         {
             string istruction = Tools.CurrentString + '\n';
