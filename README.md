@@ -38,7 +38,6 @@ $print var
 ____
 
 ```
-
 fn add n n1
   return n+n1
 end
