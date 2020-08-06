@@ -83,6 +83,16 @@ namespace RobinScript
         OpMolt,
         Eol,
     }
+    enum VariableTypes
+    {
+        Function,
+        Variable,
+        Class,
+        Const_Int,
+        Const_String,
+        Const_Bool,
+        Const_Float,
+    }
     class Program
     { 
         static void Main(string[] args)
@@ -98,7 +108,7 @@ namespace RobinScript
                     }
                 default:
                     for (int i = 0; i < args.Count(); i++) {
-                        try { Tools.ExecFile(args[i]); Storage.Reset(); } catch (Crash) { Console.ReadKey(); continue; }
+                        try { Tools.ExecFile(args[i]); Storage.Reset(); Tools.LineCounter = 0; } catch (Crash) { Console.ReadKey(); continue; }
                         Tools.GetExecuteTime();
                     }break;
             }
@@ -113,13 +123,14 @@ namespace RobinScript
     {
         public static int LineCounter = 0;
         public static string CurrentString = "";
+        private static System.Diagnostics.Stopwatch ExecuteTimer = new System.Diagnostics.Stopwatch();
+
         public static void ExecLine(string _line)
         {
             CurrentString = _line;
             if (!string.IsNullOrWhiteSpace(_line))
                 Interpreter.Run(Lexer.GetProcessTable(new Source() { Value = Source.RemoveCommentsStatic(_line) }, new Source() { Value = Source.GetEmptyStringStatic(Source.RemoveCommentsStatic(_line)) }));
         }
-        private static System.Diagnostics.Stopwatch ExecuteTimer = new System.Diagnostics.Stopwatch();
         public static void ExecFile(string Path)
         {
             string[] Code = System.IO.File.ReadAllLines(Path);
@@ -132,6 +143,17 @@ namespace RobinScript
                 LineCounter++;
             }
             ExecuteTimer.Stop();
+        }
+        public static void ExecCode(string _code)
+        {
+            string[] Code = _code.Split(new char[] { '\r', '\n' });
+            for (int i = 0; i < Code.Count(); i++) {
+                CurrentString = Code[i];
+                if (!string.IsNullOrWhiteSpace(Code[i])) {
+                    Interpreter.Run(Lexer.GetProcessTable(new Source() { Value = Source.RemoveCommentsStatic(Code[i]) }, new Source() { Value = Source.GetEmptyStringStatic(Source.RemoveCommentsStatic(Code[i])) }));
+                }
+                LineCounter++;
+            }
         }
         public static void GetExecuteTime()
         {
@@ -146,6 +168,8 @@ namespace RobinScript
         public static ProcessTable GetProcessTable(Source Line, Source LineEmptyString)
         {
             // configurare un metodo di compressione delle espressioni racchiuse tra '[' e ']'                
+            // configurare un metodo di riconoscimento delle condizioni e tramite della variabili booleane controllare la propria esecuzione
+            // per le condizioni 'if' e 'elif' controllare il numero di elementi dello split di ' ', in caso 3 -> 'arg0' 'op' 'arg1', in caso 1 -> metodo booleano sottoposto ad una variabile in posizione 'arg0'
 
             TokenTable TokenTable = TokenTable.GetTokenTable(Line);
             ProcessTable ProcessTable = new ProcessTable();
@@ -183,7 +207,8 @@ namespace RobinScript
                             ProcessTable.Add(ProcessTypes.Printlns, TokenTable.TokenName);
                         else {
                             List<string> parameters = new List<string>();
-                            // collegare tutti i parametri alla lista, ciclando il token table a partire dall'index corrente
+                            // verificare il tipo del contenuto di una variabile
+                            // -- ultima modifica qui --
                             for (int i=index; i< TokenTable.TokenType.Count(); i++) {
                                 if (TokenTable.TokenType[i] == TokenTypes.FunctionParameter)
                                     parameters.Add(TokenTable.TokenName[i]);
@@ -378,7 +403,7 @@ namespace RobinScript
                     try { for (int i = 1; i <= int.Parse(ProcessArg[2]); i++) Console.WriteLine(ProcessArg[1]); } catch (ArgumentNullException) { Debuger.Except("Cannot find all requested parameters", $"Try with '{Tools.CurrentString} 5', where '5' is the times to spam first parameter"); } catch (FormatException) { Debuger.Except($"Cannot use '{ProcessArg[2]}' as int", $"Try with '{Tools.CurrentString.Remove(Tools.CurrentString.LastIndexOf(ProcessArg[2]))} 5', where '5' is the times to spam first parameter"); } catch (ArgumentOutOfRangeException) { Debuger.Except("Cannot find all requested parameters", $"Try with '{Tools.CurrentString} 5', where '5' is the times to spam first parameter"); }
                     break;
                 case ProcessTypes.CallFunction:
-                    // configurare un sistema di assegnamento e corrispondenza parametri funzione
+                    // configurare un metodo in Storage di ritorno del valore di una funzione dopo l'esecuzione tramite il metodo 'ExecCode'
                     Storage.GetFunction(ProcessTable.OptionalProcessAttribute);
                     break;
                 default:
@@ -404,8 +429,8 @@ namespace RobinScript
     {
         // memory
         static private Dictionary<string, object> Variables = new Dictionary<string, object>();
-        static private Dictionary<string, Source> Functions = new Dictionary<string, Source>();
-        static private Dictionary<string, Source> Classes = new Dictionary<string, Source>();
+        static private Dictionary<string, string> Functions = new Dictionary<string, string>();
+        static private Dictionary<string, string> Classes = new Dictionary<string, string>();
         // get
         static public string GetVariable(string name)
         {
@@ -415,23 +440,32 @@ namespace RobinScript
                 Debuger.Except($"'{name}' is not definied yet!", $"Define your variable, Example: '{name} = 5' where '5' is the value of '{name}'");
             return null;
         }
-        static public Source GetFunction(string name)
+        static public string GetFunction(string name)
         {
             if (Functions.ContainsKey(name))
                 return Functions[name];
             Debuger.Except($"'{name}' function does not definied jet!", "Check the function name");
             return null;
         }
-        static public Source GetClass(string name)
+        static public string GetClass(string name)
         {
             if (Classes.ContainsKey(name))
                 return Classes[name];
             else
                 return null;
         }
-        // set or init
-        [Obsolete] static public void SetVariable(string key, object value)
+        // get function ritorna solo il codice
+        // get function return value esegue il codice e ritorna il valore
+        static public object GetFunctionReturnValue(string name)
         {
+            Tools.ExecCode(Functions[name]);
+            return null;
+        }
+        // set or init
+        static public void SetVariable(VariableTypes type, string key, object value)
+        {
+            // configurare a seconda del tipo una modalità di ottimizzamento del valore 'string' -> metodo Source.FixString, dove 'FixString' rappresenta un metodo di rimozione apici e sostituzione caratteri speciali con la loro forma d'effetto '\\n', '\n'
+            // impostare una condizione per le stringhe che verifichi sia la presenza degli apici che doppi acipi ''', '"'
             if (!Variables.ContainsKey(key))
                 Variables.Add(key, value);
             else
@@ -456,34 +490,6 @@ namespace RobinScript
             Variables.Clear();
             Functions.Clear();
             Classes.Clear();
-        }
-
-        public class Variable
-        {
-            enum VariableType {
-                Function,
-                Variable,
-                Class,
-                Const_Int,
-                Const_String,
-                Const_Bool,
-                Const_Float,
-            }
-            public Variable(List<ProcessTypes> forPredictValueType, string name, object value)
-            {
-                VariableType type = new VariableType();
-                for (int i = 0; i < forPredictValueType.Count(); i++) {
-                    if (forPredictValueType[i] == ProcessTypes.SetVariable)
-                        continue;
-                    else if (forPredictValueType[i] == ProcessTypes.CallFunction) {
-                         
-                    } else {
-
-                    }
-                }
-
-                SetVariable(name, value);
-            }
         }
     }
     class Source
