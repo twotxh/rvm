@@ -5,13 +5,10 @@ using System.Text;
 
 namespace RobinScript
 {
-
     [Serializable]
     public class Crash : Exception
     {
         public Crash() { }
-        public Crash(string message) : base(message) { }
-        public Crash(string message, Exception inner) : base(message, inner) { }
         protected Crash(
           System.Runtime.Serialization.SerializationInfo info,
           System.Runtime.Serialization.StreamingContext context) : base(info, context) { }
@@ -49,6 +46,7 @@ namespace RobinScript
         EncryptFile,
         DecryptFile,
         RenameFile,
+        Compile,
         Print, // print
         Println, // print + \n
         Printlns, // spam string print +\n 
@@ -94,13 +92,13 @@ namespace RobinScript
         Const_Float,
     }
     class Program
-    { 
+    {
         static void Main(string[] args)
         {
-            Console.Title = "RobinScript";
             switch (args.Count())
             {
                 case 0:
+                    Console.Title = "RobinScript";
                     Welcome();
                     while (true) {
                         Console.Write("\n:: ");
@@ -108,6 +106,7 @@ namespace RobinScript
                     }
                 default:
                     for (int i = 0; i < args.Count(); i++) {
+                        Console.Title = args[i];
                         try { Tools.ExecFile(args[i]); Storage.Reset(); Tools.LineCounter = 0; } catch (Crash) { Console.ReadKey(); continue; }
                         Tools.GetExecuteTime();
                     }break;
@@ -131,7 +130,7 @@ namespace RobinScript
             if (!string.IsNullOrWhiteSpace(_line))
                 Interpreter.Run(Lexer.GetProcessTable(new Source() { Value = Source.RemoveCommentsStatic(_line) }, new Source() { Value = Source.GetEmptyStringStatic(Source.RemoveCommentsStatic(_line)) }));
         }
-        public static void ExecFile(string Path)
+        public static void ExecFile(string Path) 
         {
             string[] Code = System.IO.File.ReadAllLines(Path);
             ExecuteTimer.Start();
@@ -155,6 +154,10 @@ namespace RobinScript
                 LineCounter++;
             }
         }
+        public static void Compile(string Path)
+        {
+
+        }
         public static void GetExecuteTime()
         {
             Console.WriteLine("\nExecute time: {0}ms", ExecuteTimer.ElapsedMilliseconds);
@@ -175,7 +178,7 @@ namespace RobinScript
             ProcessTable ProcessTable = new ProcessTable();
             for (int index = 0; index < TokenTable.TokenType.Count(); index++) {
                 TokenTypes token = TokenTable.TokenType[index];
-                Console.WriteLine("Type: {0} Name: {1} Value: {2}", TokenTable.TokenType[index], TokenTable.TokenName[index], TokenTable.TokenValue[index]);
+                //Console.WriteLine("Type: {0} Name: {1} Value: {2}", TokenTable.TokenType[index], TokenTable.TokenName[index], TokenTable.TokenValue[index]);
 
                 if (isIndentArea) {
                     if (token == TokenTypes.Dedent) {
@@ -205,10 +208,10 @@ namespace RobinScript
                             ProcessTable.Add(ProcessTypes.Prints, TokenTable.TokenName);
                         else if (TokenTable.TokenName[index] == "printlns")
                             ProcessTable.Add(ProcessTypes.Printlns, TokenTable.TokenName);
+                        else if (TokenTable.TokenName[index] == "compile")
+                            ProcessTable.Add(ProcessTypes.Compile, TokenTable.TokenName);
                         else {
                             List<string> parameters = new List<string>();
-                            // verificare il tipo del contenuto di una variabile
-                            // -- ultima modifica qui --
                             for (int i=index; i< TokenTable.TokenType.Count(); i++) {
                                 if (TokenTable.TokenType[i] == TokenTypes.FunctionParameter)
                                     parameters.Add(TokenTable.TokenName[i]);
@@ -228,8 +231,16 @@ namespace RobinScript
                         break;
                     case TokenTypes.Load:
                         break;
-                    case TokenTypes.VariableAssigment:
-                        break;
+                    case TokenTypes.VariableAssigment:/*
+                        List<string> parameters = new List<string>();
+                        for (int i = index; i < TokenTable.TokenType.Count(); i++) {
+                            if (TokenTable.TokenType[i] == TokenTypes.CallingFunction)
+                                parameters.Add(TokenTable.TokenName[i]);
+                            else
+                                break;
+                        }
+                        ProcessTable.Add();
+                        break;*/
                     case TokenTypes.CallingVariable:
                         break;
                     case TokenTypes.Use:
@@ -266,13 +277,12 @@ namespace RobinScript
             word = "";
             bool isInterpolate = false;
             bool isParamArea = false;
-            //line.Value = line
 
             for (int index = 0; index < line.Value.Length; index++) {
                 char term = line.Value[index];
                 word += term;
 
-                if (term == '"') isInterpolate = (isInterpolate) ? false : true;
+                if (term == '"' || term == '\'') isInterpolate = (isInterpolate) ? false : true;
                 if (isInterpolate) continue;
                 switch (term) {
 
@@ -372,6 +382,11 @@ namespace RobinScript
     }
     class Interpreter
     {
+        public const string CompilerService =
+            "class Program { static void Main(string[] args) {}} }"+
+            "class Debuger { public static void Except(string error, string tip){ string istruction = Tools.CurrentString + '\n';for (int i = 0; i < Tools.LineCounter.ToString().Length + 3; i++)istruction += ' ';for (int j=0;j< Tools.CurrentString.Count();j++) {istruction += '^';} istruction+= \" -> \"; Console.WriteLine(Tools.LineCounter + \" | \"+istruction+error+\"\nTip: \"+tip);throw new Crash();} }" +
+            "class Interpreter { public static void Run(ProcessTable ProcessTable) { ProcessTypes ProcessType = ProcessTypes.Null; try { ProcessType = ProcessTable.ProcessType; } catch (ArgumentOutOfRangeException) { goto Finish; } List<string> ProcessArg = ProcessTable.ProcessArgument; StringBuilder result = new StringBuilder(); switch (ProcessType) { case ProcessTypes.Print:for (int i = 1; i < ProcessArg.Count(); i++)result.Append(Source.FixString(ProcessArg[i]));Console.Write(result);break;case ProcessTypes.Println:for (int i = 1; i < ProcessArg.Count(); i++)result.Append(Source.FixString(ProcessArg[i]));Console.WriteLine(result);break;case ProcessTypes.Printf:string tmp = \"for (int i = 2; i < ProcessArg.Count(); i++tmp = tmp.Replace('{'+(i-2)+'}', ProcessArg[i]);Console.Write(Source.FixString(tmp));break;case ProcessTypes.Prints:try { for (int i = 1; i <= int.Parse(ProcessArg[2]); i++) result.Append(Source.FixString(ProcessArg[1])); Console.Write(result); } catch (ArgumentNullException) { Debuger.Except(\"Cannot find all requested parameters\", $\"Try with \'{Tools.CurrentString} 5\', where \'5\' is the times to spam first parameter\"); } catch (FormatException) { Debuger.Except($\"Cannot use \'{ProcessArg[2]}\' as int\", $\"Try with '{Tools.CurrentString.Remove(Tools.CurrentString.LastIndexOf(ProcessArg[2]))} 5\', where \'5\' is the times to spam first parameter\"); } catch (ArgumentOutOfRangeException) { Debuger.Except(\"Cannot find all requested parameters\", $\"Try with '{Tools.CurrentString} 5', where '5' is the times to spam first parameter\"); } break;case ProcessTypes.Printlnstry { for (int i = 1; i <= int.Parse(ProcessArg[2]); i++) result.AppendLine(Source.FixString(ProcessArg[1])); Console.Write(result); } catch (ArgumentNullException) { Debuger.Except(\"Cannot find all requested parameters\", $\"Try with '{Tools.CurrentString} 5', where '5' is the times to spam first parameter\"); } catch (FormatException) { Debuger.Except($\"Cannot use '{ProcessArg[2]}' as int\", $\"Try with '{Tools.CurrentString.Remove(Tools.CurrentString.LastIndexOf(ProcessArg[2]))} 5', where '5' is the times to spam first parameter\"); } catch (ArgumentOutOfRangeException) { Debuger.Except(\"Cannot find all requested parameters\", $\"Try with '{Tools.CurrentString} 5', where '5' is the times to spam first parameter\"); break;case ProcessTypes.CallFunction:Storage.GetFunctionReturnValue(ProcessTable.OptionalProcessAttribute, ProcessArg);break;default:Debuger.Except(\"Invalid istruction!\", \"Check the documentation to solve the problem\");break;}Finish:;}}" +
+            "";
         public static void Run(ProcessTable ProcessTable)
         {
             ProcessTypes ProcessType = ProcessTypes.Null;
@@ -379,33 +394,50 @@ namespace RobinScript
                 ProcessType = ProcessTable.ProcessType;
             } catch (ArgumentOutOfRangeException) { goto Finish; }
             List<string> ProcessArg = ProcessTable.ProcessArgument;
+            StringBuilder result = new StringBuilder();
 
             switch (ProcessType) {
                 case ProcessTypes.Print:
                     for (int i = 1; i < ProcessArg.Count(); i++)
-                        Console.Write(ProcessArg[i]);
+                        result.Append(Source.FixString(ProcessArg[i]));
+                    Console.Write(result);
                     break;
                 case ProcessTypes.Println:
                     for (int i = 1; i < ProcessArg.Count(); i++)
-                        Console.Write(ProcessArg[i]);
-                    Console.WriteLine();
+                        result.Append(Source.FixString(ProcessArg[i]));
+                    Console.WriteLine(result);
                     break;
                 case ProcessTypes.Printf:
-                    string result = ProcessArg[1];
+                    string tmp = "";
                     for (int i = 2; i < ProcessArg.Count(); i++)
-                        result = result.Replace("{"+(i-2)+"}", ProcessArg[i]);
-                    Console.Write(result);
+                        tmp = tmp.Replace("{"+(i-2)+"}", ProcessArg[i]);
+                    Console.Write(Source.FixString(tmp));
                     break;
                 case ProcessTypes.Prints:
-                    try { for (int i = 1; i <= int.Parse(ProcessArg[2]); i++) Console.Write(ProcessArg[1]); } catch (ArgumentNullException) { Debuger.Except("Cannot find all requested parameters", $"Try with '{Tools.CurrentString} 5', where '5' is the times to spam first parameter"); } catch (FormatException) { Debuger.Except($"Cannot use '{ProcessArg[2]}' as int", $"Try with '{Tools.CurrentString.Remove(Tools.CurrentString.LastIndexOf(ProcessArg[2]))} 5', where '5' is the times to spam first parameter"); } catch (ArgumentOutOfRangeException) { Debuger.Except("Cannot find all requested parameters", $"Try with '{Tools.CurrentString} 5', where '5' is the times to spam first parameter"); }
+                    try { for (int i = 1; i <= int.Parse(ProcessArg[2]); i++) result.Append(Source.FixString(ProcessArg[1])); Console.Write(result); } catch (ArgumentNullException) { Debuger.Except("Cannot find all requested parameters", $"Try with '{Tools.CurrentString} 5', where '5' is the times to spam first parameter"); } catch (FormatException) { Debuger.Except($"Cannot use '{ProcessArg[2]}' as int", $"Try with '{Tools.CurrentString.Remove(Tools.CurrentString.LastIndexOf(ProcessArg[2]))} 5', where '5' is the times to spam first parameter"); } catch (ArgumentOutOfRangeException) { Debuger.Except("Cannot find all requested parameters", $"Try with '{Tools.CurrentString} 5', where '5' is the times to spam first parameter"); }
                     break;
                 case ProcessTypes.Printlns:
-                    try { for (int i = 1; i <= int.Parse(ProcessArg[2]); i++) Console.WriteLine(ProcessArg[1]); } catch (ArgumentNullException) { Debuger.Except("Cannot find all requested parameters", $"Try with '{Tools.CurrentString} 5', where '5' is the times to spam first parameter"); } catch (FormatException) { Debuger.Except($"Cannot use '{ProcessArg[2]}' as int", $"Try with '{Tools.CurrentString.Remove(Tools.CurrentString.LastIndexOf(ProcessArg[2]))} 5', where '5' is the times to spam first parameter"); } catch (ArgumentOutOfRangeException) { Debuger.Except("Cannot find all requested parameters", $"Try with '{Tools.CurrentString} 5', where '5' is the times to spam first parameter"); }
+                    try { for (int i = 1; i <= int.Parse(ProcessArg[2]); i++) result.AppendLine(Source.FixString(ProcessArg[1])); Console.Write(result); } catch (ArgumentNullException) { Debuger.Except("Cannot find all requested parameters", $"Try with '{Tools.CurrentString} 5', where '5' is the times to spam first parameter"); } catch (FormatException) { Debuger.Except($"Cannot use '{ProcessArg[2]}' as int", $"Try with '{Tools.CurrentString.Remove(Tools.CurrentString.LastIndexOf(ProcessArg[2]))} 5', where '5' is the times to spam first parameter"); } catch (ArgumentOutOfRangeException) { Debuger.Except("Cannot find all requested parameters", $"Try with '{Tools.CurrentString} 5', where '5' is the times to spam first parameter"); }
+                    break;
+                case ProcessTypes.Compile:
+                    for (int i = 0; i < ProcessArg.Count(); i++) {
+                        Microsoft.CSharp.CSharpCodeProvider codeProvider = new Microsoft.CSharp.CSharpCodeProvider();
+                        System.CodeDom.Compiler.ICodeCompiler icc = codeProvider.CreateCompiler();
+                        System.CodeDom.Compiler.CompilerParameters parameters = new System.CodeDom.Compiler.CompilerParameters();
+                        parameters.GenerateExecutable = true;
+                        parameters.OutputAssembly = ProcessArg[i].Remove(ProcessArg[i].LastIndexOf('.')) + ".exe";
+                        System.CodeDom.Compiler.CompilerResults results = icc.CompileAssemblyFromSource(parameters, CompilerService);
+                    }
                     break;
                 case ProcessTypes.CallFunction:
-                    // configurare un metodo in Storage di ritorno del valore di una funzione dopo l'esecuzione tramite il metodo 'ExecCode'
-                    Storage.GetFunction(ProcessTable.OptionalProcessAttribute);
+                    Storage.GetFunctionReturnValue(ProcessTable.OptionalProcessAttribute, ProcessArg);
                     break;
+                case ProcessTypes.SetVariable:/*
+                    VariableTypes type = new VariableTypes();
+                    if (ProcessArg[0].Contains('"') || ProcessArg[0].Contains('\''))
+                        type = VariableTypes.Const_String;
+                    Storage.SetVariable(type, );
+                    break;*/
                 default:
                     Debuger.Except("Invalid istruction!", "Check the documentation to solve the problem");
                     break;
@@ -432,15 +464,15 @@ namespace RobinScript
         static private Dictionary<string, string> Functions = new Dictionary<string, string>();
         static private Dictionary<string, string> Classes = new Dictionary<string, string>();
         // get
-        static public string GetVariable(string name)
+        static public object GetVariable(string name)
         {
             if (Variables.ContainsKey(name))
-                return Variables[name].ToString();
+                return Variables[name];
             else
                 Debuger.Except($"'{name}' is not definied yet!", $"Define your variable, Example: '{name} = 5' where '5' is the value of '{name}'");
             return null;
         }
-        static public string GetFunction(string name)
+        [Obsolete]static public string GetFunction(string name)
         {
             if (Functions.ContainsKey(name))
                 return Functions[name];
@@ -456,29 +488,52 @@ namespace RobinScript
         }
         // get function ritorna solo il codice
         // get function return value esegue il codice e ritorna il valore
-        static public object GetFunctionReturnValue(string name)
+        static public object GetFunctionReturnValue(string name, List<string> paramaters)
         {
-            Tools.ExecCode(Functions[name]);
+            // per ogni parametro elaborare il tipo e raffinare il risultato '"ciao"' -> 'ciao'
+            Tools.ExecCode(GetFunction(name));
             return null;
         }
         // set or init
-        static public void SetVariable(VariableTypes type, string key, object value)
+        static public void SetVariable(VariableTypes type, string name, List<string> value)
         {
             // configurare a seconda del tipo una modalità di ottimizzamento del valore 'string' -> metodo Source.FixString, dove 'FixString' rappresenta un metodo di rimozione apici e sostituzione caratteri speciali con la loro forma d'effetto '\\n', '\n'
             // impostare una condizione per le stringhe che verifichi sia la presenza degli apici che doppi acipi ''', '"'
-            if (!Variables.ContainsKey(key))
-                Variables.Add(key, value);
+            object result = value[0];
+            switch (type) {
+                case VariableTypes.Function:
+                    value.RemoveAt(0);
+                    result = GetFunctionReturnValue(value[0], value);
+                    break;
+                case VariableTypes.Variable:
+                    result = GetVariable(value[0]);
+                    break;
+                case VariableTypes.Class:
+                    break;
+                case VariableTypes.Const_Int:
+                    result = Convert.ToInt32(new System.Data.DataTable().Compute(value[0], ""));
+                    break;
+                case VariableTypes.Const_String:
+                    result = Source.FixString(value[0]);
+                    break;
+                case VariableTypes.Const_Bool:
+                    result = bool.Parse(value[0]);
+                    break;
+            }
+
+            if (!Variables.ContainsKey(name))
+                Variables.Add(name, result);
             else
-                Variables[key] = value;
+                Variables[name] = result;
         }
-        static public void NewFunction(string key, string param, Source value)
+        static public void NewFunction(string key, string param, string value)
         {
             if (!Functions.ContainsKey(key))
                 Functions.Add(key, value);
             else
                 Debuger.Except($"'{key}' function exists yet!", $"Try to rename it, example: '{key}NewFunction'");
         }
-        static public void NewClass(string key, Source value)
+        static public void NewClass(string key, string value)
         {
             if (!Classes.ContainsKey(key))
                 Classes.Add(key, value);
@@ -592,9 +647,9 @@ namespace RobinScript
             string result = "";
             bool isInterpolate = false;
             for (int j = 0; j < Value.Length; j++) {
-                if (Value[j] == '"') {
+                if (Value[j] == '"' || Value[j] == '\'') {
                     isInterpolate = (!isInterpolate) ? true : false;
-                    result += '"';
+                    result += Value[j];
                     continue;
                 }
                 else if (isInterpolate) {
@@ -618,9 +673,9 @@ namespace RobinScript
             string result = "";
             bool isInterpolate = false;
             for (int j = 0; j < s.Length; j++) {
-                if (s[j] == '"') {
+                if (s[j] == '"' || s[j] == '\'') {
                     isInterpolate = (!isInterpolate) ? true : false;
-                    result += '"';
+                    result += s[j];
                     continue;
                 } else if (isInterpolate) {
                     result += s[j];
@@ -636,6 +691,25 @@ namespace RobinScript
                 if (!string.IsNullOrWhiteSpace(resultSplit[i])) toReturn.Add(resultSplit[i]);
             }
             return toReturn;
+        }
+        public static string FixString(string toFix)
+        {
+            try {
+                return toFix
+                .Replace("\\n", "\n")
+                .Replace("\\r", "\r")
+                .Replace("\\t", "\t")
+                .Replace("\\b", "\b")
+                .Replace("\\a", "\a")
+                .Replace("\\v", "\v")
+                .Replace("\\\"", "[double_intentional_apex]")
+                .Replace("\\'", "[single_intentional_apex]")
+                .Replace("\"", "")
+                .Replace("'", "")
+                .Replace("[single_intentional_apex]", "'")
+                .Replace("[double_intentional_apex]", "\"");
+            } catch (ArgumentNullException) { } catch (NullReferenceException) { }
+            return toFix;
         }
     }
     class Debuger

@@ -1,3 +1,1 @@
-fn add n1 n2
-	$println "ciao"
-end
+$printlns 'prova' 10000
