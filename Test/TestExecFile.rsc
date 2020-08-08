@@ -1,1 +1,3 @@
-$printlns 'prova' 10000
+fn main
+	$println "ciao"
+end

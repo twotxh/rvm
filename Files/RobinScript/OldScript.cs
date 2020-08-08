@@ -12,7 +12,7 @@ namespace RobinScript
         protected Crash(
           System.Runtime.Serialization.SerializationInfo info,
           System.Runtime.Serialization.StreamingContext context) : base(info, context) { }
-    }
+    } //
     enum ProcessTypes
     {
         Null,
@@ -46,7 +46,6 @@ namespace RobinScript
         EncryptFile,
         DecryptFile,
         RenameFile,
-        Compile,
         Print, // print
         Println, // print + \n
         Printlns, // spam string print +\n 
@@ -56,7 +55,7 @@ namespace RobinScript
         Pause, // pause console process
         Init, // initialize a class in a variable
         Cast, // cast a variable: param -> (var_to_cast, int) where int is the type in to cast 'var_to_cast'
-    }
+    } 
     enum TokenTypes
     {
         Undefined = 0,
@@ -106,6 +105,12 @@ namespace RobinScript
                     }
                 default:
                     for (int i = 0; i < args.Count(); i++) {
+                        if (args[i].ToLower().Replace(" ", "") == "-c") {
+                            var icc = new Microsoft.CSharp.CSharpCodeProvider().CreateCompiler();
+                            var parameters = new System.CodeDom.Compiler.CompilerParameters() { GenerateExecutable = true, OutputAssembly = args[i].Remove(args[i].LastIndexOf('.')) + ".exe"};
+                            var results = icc.CompileAssemblyFromSource(parameters, Tools.Compile(args[i+1]));
+                            Console.WriteLine("Compiled in "+args[i+1].Remove(args[i].LastIndexOf('.')) + ".exe");
+                        }
                         Console.Title = args[i];
                         try { Tools.ExecFile(args[i]); Storage.Reset(); Tools.LineCounter = 0; } catch (Crash) { Console.ReadKey(); continue; }
                         Tools.GetExecuteTime();
@@ -117,9 +122,10 @@ namespace RobinScript
         {
             Console.Write("RobinScript 0.5 (32 bit/ 64 bit) - State: OpenSource, Licese: Apache Licese 2.0 \nAuthor: Carpal, Repository: https://github.com/Carpall/RobinScript");
         }
-    }
+    } // 
     class Tools
     {
+        //public static string CompilerService;
         public static int LineCounter = 0;
         public static string CurrentString = "";
         private static System.Diagnostics.Stopwatch ExecuteTimer = new System.Diagnostics.Stopwatch();
@@ -154,20 +160,29 @@ namespace RobinScript
                 LineCounter++;
             }
         }
-        public static void Compile(string Path)
+        public static string Compile(string Path)
         {
-
+            //CompilerService = "using System;using System.Collections.Generic;using System.Text;using System.Linq;namespace RobinCompiled{ class Program { static void Main(string[] args) {string[] code = \""+System.IO.File.ReadAllText(Path)+"\".Split(new char[] {'\n', '\r'}); List<List<ProcessTable>> Bytecode = new List<string>();for (int i=0;i<code.Count();i++){Bytecode.Add()}}} }" +
+            //    "class Debuger { public static void Except(string error, string tip){ string istruction = Tools.CurrentString + '\n';for (int i = 0; i < Tools.LineCounter.ToString().Length + 3; i++)istruction += ' ';for (int j=0;j< Tools.CurrentString.Count();j++) {istruction += '^';} istruction+= \" -> \"; Console.WriteLine(Tools.LineCounter + \" | \"+istruction+error+\"\nTip: \"+tip);throw new Crash();} }" +
+            //    "class Interpreter { public static void Run(ProcessTable ProcessTable) { ProcessTypes ProcessType = ProcessTypes.Null; try { ProcessType = ProcessTable.ProcessType; } catch (ArgumentOutOfRangeException) { goto Finish; } List<string> ProcessArg = ProcessTable.ProcessArgument; StringBuilder result = new StringBuilder(); switch (ProcessType) { case ProcessTypes.Print:for (int i = 1; i < ProcessArg.Count(); i++)result.Append(Source.FixString(ProcessArg[i]));Console.Write(result);break;case ProcessTypes.Println:for (int i = 1; i < ProcessArg.Count(); i++)result.Append(Source.FixString(ProcessArg[i]));Console.WriteLine(result);break;case ProcessTypes.Printf:string tmp = \"for (int i = 2; i < ProcessArg.Count(); i++tmp = tmp.Replace('{'+(i-2)+'}', ProcessArg[i]);Console.Write(Source.FixString(tmp));break;case ProcessTypes.Prints:try { for (int i = 1; i <= int.Parse(ProcessArg[2]); i++) result.Append(Source.FixString(ProcessArg[1])); Console.Write(result); } catch (ArgumentNullException) { Debuger.Except(\"Cannot find all requested parameters\", $\"Try with \'{Tools.CurrentString} 5\', where \'5\' is the times to spam first parameter\"); } catch (FormatException) { Debuger.Except($\"Cannot use \'{ProcessArg[2]}\' as int\", $\"Try with '{Tools.CurrentString.Remove(Tools.CurrentString.LastIndexOf(ProcessArg[2]))} 5\', where \'5\' is the times to spam first parameter\"); } catch (ArgumentOutOfRangeException) { Debuger.Except(\"Cannot find all requested parameters\", $\"Try with '{Tools.CurrentString} 5', where '5' is the times to spam first parameter\"); } break;case ProcessTypes.Printlnstry { for (int i = 1; i <= int.Parse(ProcessArg[2]); i++) result.AppendLine(Source.FixString(ProcessArg[1])); Console.Write(result); } catch (ArgumentNullException) { Debuger.Except(\"Cannot find all requested parameters\", $\"Try with '{Tools.CurrentString} 5', where '5' is the times to spam first parameter\"); } catch (FormatException) { Debuger.Except($\"Cannot use '{ProcessArg[2]}' as int\", $\"Try with '{Tools.CurrentString.Remove(Tools.CurrentString.LastIndexOf(ProcessArg[2]))} 5', where '5' is the times to spam first parameter\"); } catch (ArgumentOutOfRangeException) { Debuger.Except(\"Cannot find all requested parameters\", $\"Try with '{Tools.CurrentString} 5', where '5' is the times to spam first parameter\"); break;case ProcessTypes.CallFunction:Storage.GetFunctionReturnValue(ProcessTable.OptionalProcessAttribute, ProcessArg);break;default:Debuger.Except(\"Invalid istruction!\", \"Check the documentation to solve the problem\");break;}Finish:;}}" +
+            //    "class ProcessTable { public ProcessTypes ProcessType { get; set; } = new ProcessTypes(); public List<string> ProcessArgument { get; set; } = new List<string>(); public string OptionalProcessAttribute { get; set; } = \"\"; public void Add(ProcessTypes pt, List<string> pa, string opa = \"\") { ProcessType = pt; ProcessArgument = pa; OptionalProcessAttribute = opa;}}"+
+            //    "}";
+            return "";
         }
         public static void GetExecuteTime()
         {
             Console.WriteLine("\nExecute time: {0}ms", ExecuteTimer.ElapsedMilliseconds);
             Console.ReadKey();
         }
-    }
+    } //
     class Lexer
     {
 
-        public static bool isIndentArea = false; private static ProcessTypes _LastProcessType = ProcessTypes.Null; private static StringBuilder _LastProcessArg = new StringBuilder();
+        public static bool isIndentArea = false;
+        private static ProcessTypes _LastProcessType = ProcessTypes.Null;
+        private static StringBuilder _LastProcessArg = new StringBuilder();
+        private static List<string> _LastProcessParameters = new List<string>();
+        private static string _LastProcessName = "";
         public static ProcessTable GetProcessTable(Source Line, Source LineEmptyString)
         {
             // configurare un metodo di compressione delle espressioni racchiuse tra '[' e ']'                
@@ -178,24 +193,31 @@ namespace RobinScript
             ProcessTable ProcessTable = new ProcessTable();
             for (int index = 0; index < TokenTable.TokenType.Count(); index++) {
                 TokenTypes token = TokenTable.TokenType[index];
-                //Console.WriteLine("Type: {0} Name: {1} Value: {2}", TokenTable.TokenType[index], TokenTable.TokenName[index], TokenTable.TokenValue[index]);
+                Console.WriteLine("Type: {0} Name: {1} Value: {2}", TokenTable.TokenType[index], TokenTable.TokenName[index], TokenTable.TokenValue[index]);
 
                 if (isIndentArea) {
                     if (token == TokenTypes.Dedent) {
                         isIndentArea = false;
-                        ProcessTable.Add(_LastProcessType, new List<string>() { _LastProcessArg.ToString() });
+                        ProcessTable.Add(_LastProcessType, _LastProcessParameters, _LastProcessName+" "+_LastProcessArg.ToString() );
+                        continue;
                     } else
                         _LastProcessArg.AppendLine(Line.Value);
                     break;
                 }
-                if (token == TokenTypes.Indent) {
-                    isIndentArea = true;
-                    break;
-                }
 
                 switch (token) {
-
+                    case TokenTypes.Indent:
+                        isIndentArea = true;
+                        break;
                     case TokenTypes.FunctionDescribement:
+                        List<string> parameters = new List<string>();
+                        for (int i = index; i < TokenTable.TokenType.Count(); i++) {
+                            if (TokenTable.TokenType[i] == TokenTypes.FunctionParameter)
+                                parameters.Add(TokenTable.TokenName[i]);
+                        }
+                        _LastProcessName = TokenTable.TokenName[index];
+                        _LastProcessParameters = parameters;
+                        _LastProcessType = ProcessTypes.NewFunction;
                         break;
                     case TokenTypes.CallingFunction:
                         if (TokenTable.TokenName[index] == "print")
@@ -208,17 +230,13 @@ namespace RobinScript
                             ProcessTable.Add(ProcessTypes.Prints, TokenTable.TokenName);
                         else if (TokenTable.TokenName[index] == "printlns")
                             ProcessTable.Add(ProcessTypes.Printlns, TokenTable.TokenName);
-                        else if (TokenTable.TokenName[index] == "compile")
-                            ProcessTable.Add(ProcessTypes.Compile, TokenTable.TokenName);
                         else {
-                            List<string> parameters = new List<string>();
-                            for (int i=index; i< TokenTable.TokenType.Count(); i++) {
+                            List<string> result = new List<string>();
+                            for (int i = 0; i < TokenTable.TokenType.Count(); i++) {
                                 if (TokenTable.TokenType[i] == TokenTypes.FunctionParameter)
-                                    parameters.Add(TokenTable.TokenName[i]);
-                                else
-                                    break;
+                                    result.Add(Storage.FixValue(TokenTable, TokenTable.TokenName[i]).ToString());
                             }
-                            ProcessTable.Add(ProcessTypes.CallFunction, parameters, TokenTable.TokenName[index]);
+                            ProcessTable.Add(ProcessTypes.CallFunction, result, TokenTable.TokenName[index]);
                         }
                         break;
                     case TokenTypes.ClassDescribement:
@@ -231,23 +249,14 @@ namespace RobinScript
                         break;
                     case TokenTypes.Load:
                         break;
-                    case TokenTypes.VariableAssigment:/*
-                        List<string> parameters = new List<string>();
-                        for (int i = index; i < TokenTable.TokenType.Count(); i++) {
-                            if (TokenTable.TokenType[i] == TokenTypes.CallingFunction)
-                                parameters.Add(TokenTable.TokenName[i]);
-                            else
-                                break;
-                        }
-                        ProcessTable.Add();
-                        break;*/
+                    case TokenTypes.VariableAssigment:
+                        object value = Storage.FixValue(TokenTable, TokenTable.TokenValue[index]);
+                        ProcessTable.Add(ProcessTypes.SetVariable, new List<string>() { TokenTable.TokenName[index] , value.ToString() } );
+                        goto EOL;
+                        break;
                     case TokenTypes.CallingVariable:
                         break;
                     case TokenTypes.Use:
-                        break;
-                    case TokenTypes.Indent:
-                        break;
-                    case TokenTypes.Dedent:
                         break;
                     case TokenTypes.OpenBrack:
                         break;
@@ -263,7 +272,7 @@ namespace RobinScript
             EOL:
             return ProcessTable;
         }
-    }
+    } //
     class TokenTable
     {
         public List<TokenTypes> TokenType { get; set; } = new List<TokenTypes>();
@@ -379,14 +388,15 @@ namespace RobinScript
             TokenName.Add(_tokenName);
             TokenValue.Add(_tokenValue);
         }
+        public void RemoveAt(int index)
+        {
+            TokenType.RemoveAt(index);
+            TokenName.RemoveAt(index);
+            TokenValue.RemoveAt(index);
+        }
     }
     class Interpreter
     {
-        public const string CompilerService =
-            "class Program { static void Main(string[] args) {}} }"+
-            "class Debuger { public static void Except(string error, string tip){ string istruction = Tools.CurrentString + '\n';for (int i = 0; i < Tools.LineCounter.ToString().Length + 3; i++)istruction += ' ';for (int j=0;j< Tools.CurrentString.Count();j++) {istruction += '^';} istruction+= \" -> \"; Console.WriteLine(Tools.LineCounter + \" | \"+istruction+error+\"\nTip: \"+tip);throw new Crash();} }" +
-            "class Interpreter { public static void Run(ProcessTable ProcessTable) { ProcessTypes ProcessType = ProcessTypes.Null; try { ProcessType = ProcessTable.ProcessType; } catch (ArgumentOutOfRangeException) { goto Finish; } List<string> ProcessArg = ProcessTable.ProcessArgument; StringBuilder result = new StringBuilder(); switch (ProcessType) { case ProcessTypes.Print:for (int i = 1; i < ProcessArg.Count(); i++)result.Append(Source.FixString(ProcessArg[i]));Console.Write(result);break;case ProcessTypes.Println:for (int i = 1; i < ProcessArg.Count(); i++)result.Append(Source.FixString(ProcessArg[i]));Console.WriteLine(result);break;case ProcessTypes.Printf:string tmp = \"for (int i = 2; i < ProcessArg.Count(); i++tmp = tmp.Replace('{'+(i-2)+'}', ProcessArg[i]);Console.Write(Source.FixString(tmp));break;case ProcessTypes.Prints:try { for (int i = 1; i <= int.Parse(ProcessArg[2]); i++) result.Append(Source.FixString(ProcessArg[1])); Console.Write(result); } catch (ArgumentNullException) { Debuger.Except(\"Cannot find all requested parameters\", $\"Try with \'{Tools.CurrentString} 5\', where \'5\' is the times to spam first parameter\"); } catch (FormatException) { Debuger.Except($\"Cannot use \'{ProcessArg[2]}\' as int\", $\"Try with '{Tools.CurrentString.Remove(Tools.CurrentString.LastIndexOf(ProcessArg[2]))} 5\', where \'5\' is the times to spam first parameter\"); } catch (ArgumentOutOfRangeException) { Debuger.Except(\"Cannot find all requested parameters\", $\"Try with '{Tools.CurrentString} 5', where '5' is the times to spam first parameter\"); } break;case ProcessTypes.Printlnstry { for (int i = 1; i <= int.Parse(ProcessArg[2]); i++) result.AppendLine(Source.FixString(ProcessArg[1])); Console.Write(result); } catch (ArgumentNullException) { Debuger.Except(\"Cannot find all requested parameters\", $\"Try with '{Tools.CurrentString} 5', where '5' is the times to spam first parameter\"); } catch (FormatException) { Debuger.Except($\"Cannot use '{ProcessArg[2]}' as int\", $\"Try with '{Tools.CurrentString.Remove(Tools.CurrentString.LastIndexOf(ProcessArg[2]))} 5', where '5' is the times to spam first parameter\"); } catch (ArgumentOutOfRangeException) { Debuger.Except(\"Cannot find all requested parameters\", $\"Try with '{Tools.CurrentString} 5', where '5' is the times to spam first parameter\"); break;case ProcessTypes.CallFunction:Storage.GetFunctionReturnValue(ProcessTable.OptionalProcessAttribute, ProcessArg);break;default:Debuger.Except(\"Invalid istruction!\", \"Check the documentation to solve the problem\");break;}Finish:;}}" +
-            "";
         public static void Run(ProcessTable ProcessTable)
         {
             ProcessTypes ProcessType = ProcessTypes.Null;
@@ -419,32 +429,23 @@ namespace RobinScript
                 case ProcessTypes.Printlns:
                     try { for (int i = 1; i <= int.Parse(ProcessArg[2]); i++) result.AppendLine(Source.FixString(ProcessArg[1])); Console.Write(result); } catch (ArgumentNullException) { Debuger.Except("Cannot find all requested parameters", $"Try with '{Tools.CurrentString} 5', where '5' is the times to spam first parameter"); } catch (FormatException) { Debuger.Except($"Cannot use '{ProcessArg[2]}' as int", $"Try with '{Tools.CurrentString.Remove(Tools.CurrentString.LastIndexOf(ProcessArg[2]))} 5', where '5' is the times to spam first parameter"); } catch (ArgumentOutOfRangeException) { Debuger.Except("Cannot find all requested parameters", $"Try with '{Tools.CurrentString} 5', where '5' is the times to spam first parameter"); }
                     break;
-                case ProcessTypes.Compile:
-                    for (int i = 0; i < ProcessArg.Count(); i++) {
-                        Microsoft.CSharp.CSharpCodeProvider codeProvider = new Microsoft.CSharp.CSharpCodeProvider();
-                        System.CodeDom.Compiler.ICodeCompiler icc = codeProvider.CreateCompiler();
-                        System.CodeDom.Compiler.CompilerParameters parameters = new System.CodeDom.Compiler.CompilerParameters();
-                        parameters.GenerateExecutable = true;
-                        parameters.OutputAssembly = ProcessArg[i].Remove(ProcessArg[i].LastIndexOf('.')) + ".exe";
-                        System.CodeDom.Compiler.CompilerResults results = icc.CompileAssemblyFromSource(parameters, CompilerService);
-                    }
-                    break;
+                    /// -- ///
                 case ProcessTypes.CallFunction:
                     Storage.GetFunctionReturnValue(ProcessTable.OptionalProcessAttribute, ProcessArg);
                     break;
-                case ProcessTypes.SetVariable:/*
-                    VariableTypes type = new VariableTypes();
-                    if (ProcessArg[0].Contains('"') || ProcessArg[0].Contains('\''))
-                        type = VariableTypes.Const_String;
-                    Storage.SetVariable(type, );
-                    break;*/
+                case ProcessTypes.SetVariable:
+                    Storage.SetVariable(ProcessTable.ProcessArgument[0], ProcessTable.ProcessArgument[1]);
+                    break;
+                case ProcessTypes.NewFunction:
+                    Storage.NewFunction(ProcessTable.OptionalProcessAttribute.Remove(ProcessTable.OptionalProcessAttribute.IndexOf(' ')), ProcessTable.ProcessArgument, ProcessTable.OptionalProcessAttribute.Substring(ProcessTable.OptionalProcessAttribute.IndexOf(' ')));
+                    break;
                 default:
                     Debuger.Except("Invalid istruction!", "Check the documentation to solve the problem");
                     break;
             }
             Finish:;
         }
-    }
+    } //
     class ProcessTable
     {
         public ProcessTypes ProcessType { get; set; } = new ProcessTypes();
@@ -456,7 +457,7 @@ namespace RobinScript
             ProcessArgument = pa;
             OptionalProcessAttribute = opa;
         }
-    }
+    }  //
     class Storage
     {
         // memory
@@ -472,7 +473,7 @@ namespace RobinScript
                 Debuger.Except($"'{name}' is not definied yet!", $"Define your variable, Example: '{name} = 5' where '5' is the value of '{name}'");
             return null;
         }
-        [Obsolete]static public string GetFunction(string name)
+        static public string GetFunction(string name)
         {
             if (Functions.ContainsKey(name))
                 return Functions[name];
@@ -486,52 +487,65 @@ namespace RobinScript
             else
                 return null;
         }
-        // get function ritorna solo il codice
-        // get function return value esegue il codice e ritorna il valore
         static public object GetFunctionReturnValue(string name, List<string> paramaters)
         {
-            // per ogni parametro elaborare il tipo e raffinare il risultato '"ciao"' -> 'ciao'
+            for (int i = 0; i < paramaters.Count(); i++)
+                SetVariable(Functions[name].Split(' ')[i+1], paramaters[i]);
             Tools.ExecCode(GetFunction(name));
             return null;
         }
-        // set or init
-        static public void SetVariable(VariableTypes type, string name, List<string> value)
+        static public object FixValue(TokenTable tokenTable, object value)
         {
-            // configurare a seconda del tipo una modalità di ottimizzamento del valore 'string' -> metodo Source.FixString, dove 'FixString' rappresenta un metodo di rimozione apici e sostituzione caratteri speciali con la loro forma d'effetto '\\n', '\n'
-            // impostare una condizione per le stringhe che verifichi sia la presenza degli apici che doppi acipi ''', '"'
-            object result = value[0];
-            switch (type) {
-                case VariableTypes.Function:
-                    value.RemoveAt(0);
-                    result = GetFunctionReturnValue(value[0], value);
-                    break;
-                case VariableTypes.Variable:
-                    result = GetVariable(value[0]);
-                    break;
-                case VariableTypes.Class:
-                    break;
-                case VariableTypes.Const_Int:
-                    result = Convert.ToInt32(new System.Data.DataTable().Compute(value[0], ""));
-                    break;
-                case VariableTypes.Const_String:
-                    result = Source.FixString(value[0]);
-                    break;
-                case VariableTypes.Const_Bool:
-                    result = bool.Parse(value[0]);
-                    break;
+            string result = "";
+            for (int i = 0; i < tokenTable.TokenType.Count(); i++) {
+                if (tokenTable.TokenType[i] == TokenTypes.CallingFunction) {
+                    List<string> parameters = new List<string>();
+                    for (int j = i; j < tokenTable.TokenType.Count(); j++) {
+                        if (tokenTable.TokenType[i] == TokenTypes.FunctionParameter)
+                            parameters.Add(tokenTable.TokenName[j]);
+                    } result += GetFunctionReturnValue(tokenTable.TokenName[i], parameters);
+                } else if (tokenTable.TokenType[i] != TokenTypes.FunctionParameter) {
+                    if (tokenTable.TokenName[i].Contains('"') || tokenTable.TokenName[i].Contains('\''))
+                        result += Source.FixString(result);
+                    else {
+                        string varCharacters = "abcdefghilmnopqrstuvzxywkj_òèéòçàù§";
+                        for (int k = 0; k < varCharacters.Length; k++) {
+                            if (tokenTable.TokenName[i].ToLower().Contains(varCharacters[k])) {
+                                result += GetVariable(tokenTable.TokenName[i]);
+                                break;
+                            }
+                            else if (k == varCharacters.Length - 1) {
+                                result += tokenTable.TokenName[i];
+                            }
+                        }
+                    }
+                }
             }
-
-            if (!Variables.ContainsKey(name))
-                Variables.Add(name, result);
-            else
-                Variables[name] = result;
+            try {
+                return new System.Data.DataTable().Compute(result, "");
+            } catch (Exception) {
+                return result;
+            }
         }
-        static public void NewFunction(string key, string param, string value)
+        // set or init
+        static public void SetVariable(string name, object value)
         {
-            if (!Functions.ContainsKey(key))
-                Functions.Add(key, value);
+            if (!Variables.ContainsKey(name))
+                Variables.Add(name, value);
             else
-                Debuger.Except($"'{key}' function exists yet!", $"Try to rename it, example: '{key}NewFunction'");
+                Variables[name] = value;
+        }
+        static public void NewFunction(string name, List<string> parameters, string value)
+        {
+            if (!Functions.ContainsKey(name)) {
+                string param = "";
+                for (int i = 0; i < parameters.Count(); i++) {
+                    param += ' ' + parameters[i];
+                }
+                Functions.Add(name+param, value);
+            }
+            else
+                Debuger.Except($"'{name}' function exists yet!", $"Try to rename it, example: '{name}NewFunction'");
         }
         static public void NewClass(string key, string value)
         {
