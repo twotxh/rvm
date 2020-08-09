@@ -1,17 +1,20 @@
 ﻿using System;
-
+using System.IO;
 namespace RobinScript
 {
     class Tools
     {
         public static Bytecode Compile(string Path)
         {
-            Bytecode BTTable = new Bytecode();
-            return BTTable;
+            return Parser.Parse(Lexer.Lex(File.ReadAllLines(Path)));
         }
         public static void CompileRun(string Path)
         {
-            Compile(Path);
+            Interpreter.Compute(Compile(Path));
+        }
+        public static void CompileRuntime(string Line)
+        {
+            Interpreter.Compute(Parser.Parse(Lexer.Lex(new string[] { Line })));
         }
     }
 }

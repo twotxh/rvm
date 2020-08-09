@@ -394,7 +394,7 @@ namespace RobinScript
             TokenName.RemoveAt(index);
             TokenValue.RemoveAt(index);
         }
-    }
+    } //
     class Interpreter
     {
         public static void Run(ProcessTable ProcessTable)
@@ -560,7 +560,7 @@ namespace RobinScript
             Functions.Clear();
             Classes.Clear();
         }
-    }
+    } //
     class Source
     {
         public string Value { get; set; } = "";
@@ -725,7 +725,7 @@ namespace RobinScript
             } catch (ArgumentNullException) { } catch (NullReferenceException) { }
             return toFix;
         }
-    }
+    } //[x]
     class Debuger
     {
         public static void print(string toPrint, object arg0 = null, object arg1 = null, object arg2 = null, object arg3 = null) { Console.WriteLine(toPrint + ' ' + arg0 + ' ' + arg1 + ' ' + arg2 + ' ' + arg3); }
@@ -741,5 +741,5 @@ namespace RobinScript
             Console.WriteLine(Tools.LineCounter + " | "+istruction+error+"\nTip: "+tip);
             throw new Crash();
         }
-    }
+    } //
 }

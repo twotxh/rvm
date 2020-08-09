@@ -8,10 +8,19 @@ namespace RobinScript
         Stack
     }
     public enum DataType {
-        Function,
         Variable,
-        Parameter,
+        Function,
         Class,
+        String,
+        Integear,
+        Char,
+        List,
+        Decimal,
+        Dictionary,
+        BinaryAdd,
+        BinarySub,
+        BinaryMul,
+        BinaryDiv,
     }
     public class Storage
     {
@@ -20,7 +29,6 @@ namespace RobinScript
         public Dictionary<Variable, AdressMode> Adress = new Dictionary<Variable, AdressMode>();
         public void Store()
         {
-
         }
     }
     public struct Class
@@ -36,6 +44,7 @@ namespace RobinScript
         public AdressMode Adress { get; set; }
         public Parameter[] Parameters { get; set; }
         public Bytecode Code { get; set; }
+        public DataType Type { get; set; }
     }
     public struct Variable
     {
@@ -43,12 +52,14 @@ namespace RobinScript
         public AdressMode Adress { get; set; }
         public object Value { get; set; } // make a setter for fix values (take the fix values from oldscript.cs)
         public Bytecode Code { get; set; }
+        public DataType Type { get; set; }
     }
     public struct Parameter
     {
         public string ID { get; set; }
         public object Value { get; set; }
         public AdressMode Adress { get; set; }
+        public DataType Type { get; set; }
     }
     public struct FastMemory
     {

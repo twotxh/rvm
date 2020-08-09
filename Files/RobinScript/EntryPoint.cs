@@ -1,6 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
+using System.IO;
 
 namespace RobinScript
 {
@@ -14,12 +14,16 @@ namespace RobinScript
                     Welcome();
                     while (true) {
                         Console.Write(":: ");
-                        try { Tools.Compile(Console.ReadLine()); } catch (Error) { }
+                        try { Tools.CompileRuntime(Console.ReadLine()); } catch (Error) { }
                     }
                 default:
                     for (int i = 0; i < args.Count(); i++) {
-                        Console.Title = args[i];
-                        try { Tools.Compile(args[i]); } catch (Error) { Console.ReadKey(); continue; }
+                        if (args[i] == "-c") {
+                            File.WriteAllText(args[i+1].Remove(args[i + 1].LastIndexOf('.'))+".rc", Tools.Compile(args[i+1]).ToString());
+                        } else {
+                            Console.Title = args[i];
+                            try { Tools.CompileRun(args[i]); } catch (Error) { Console.ReadKey(); continue; }
+                        }
                     }
                     break;
             }
