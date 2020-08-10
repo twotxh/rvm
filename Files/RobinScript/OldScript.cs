@@ -55,7 +55,7 @@ namespace RobinScript
         Pause, // pause console process
         Init, // initialize a class in a variable
         Cast, // cast a variable: param -> (var_to_cast, int) where int is the type in to cast 'var_to_cast'
-    } 
+    }  //
     enum TokenTypes
     {
         Undefined = 0,
@@ -79,7 +79,7 @@ namespace RobinScript
         OpSplit,
         OpMolt,
         Eol,
-    }
+    } //
     enum VariableTypes
     {
         Function,
@@ -89,7 +89,7 @@ namespace RobinScript
         Const_String,
         Const_Bool,
         Const_Float,
-    }
+    } //
     class Program
     {
         static void Main(string[] args)
@@ -682,29 +682,19 @@ namespace RobinScript
             }
             return toReturn;
         }
-        public static List<string> GetWordWrapListStatic(string s, string PatternToSplit)
+        public static string[] SmartSplit(string text, char charToSplit)
         {
-            string result = "";
+            string[] result = "";
+            int count = 0;
             bool isInterpolate = false;
-            for (int j = 0; j < s.Length; j++) {
-                if (s[j] == '"' || s[j] == '\'') {
-                    isInterpolate = (!isInterpolate) ? true : false;
-                    result += s[j];
-                    continue;
-                } else if (isInterpolate) {
-                    result += s[j];
-                    continue;
-                } else if (PatternToSplit.Contains(s[j])) {
-                    result += '⳿';
-                    continue;
-                } else result += s[j];
+            for (int i = 0; i < text.Lenght; i++){
+                if (text[i] == charToSplit)
+                if (text[i] == '\'') {
+                    isInterpolate = (isInterpolate) ? false : true;
+                    result[count] +='\'';
+                }
             }
-            List<string> toReturn = new List<string>();
-            string[] resultSplit = result.Split('⳿');
-            for (int i = 0; i < resultSplit.Count(); i++) {
-                if (!string.IsNullOrWhiteSpace(resultSplit[i])) toReturn.Add(resultSplit[i]);
-            }
-            return toReturn;
+            return result;
         }
         public static string FixString(string toFix)
         {
@@ -725,7 +715,7 @@ namespace RobinScript
             } catch (ArgumentNullException) { } catch (NullReferenceException) { }
             return toFix;
         }
-    } //[x]
+    } //
     class Debuger
     {
         public static void print(string toPrint, object arg0 = null, object arg1 = null, object arg2 = null, object arg3 = null) { Console.WriteLine(toPrint + ' ' + arg0 + ' ' + arg1 + ' ' + arg2 + ' ' + arg3); }

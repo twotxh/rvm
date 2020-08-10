@@ -7,14 +7,14 @@ namespace RobinScript
     {
         public Error(string error, string tip)
         {
-            string istruction = Interpreter.ExternBTTable.LineIstruction + '\n';
-            for (int i = 0; i < Interpreter.ExternBTTable.LineNumber.ToString().Length + 3; i++)
+            string istruction = Lexer.CurrentLine+ '\n';
+            for (int i = 0; i < Lexer.CurrentLineNum.ToString().Length + 3; i++)
                 istruction += ' ';
-            for (int j = 0; j < istruction.Length; j++) {
+            for (int j = 0; j < Lexer.CurrentLine.Length; j++) {
                 istruction += '^';
             }
             istruction += " -> ";
-            Console.WriteLine(Interpreter.ExternBTTable.LineNumber + " | " + istruction + error + "\nTip: " + tip);
+            Console.WriteLine(Lexer.CurrentLineNum + " | " + istruction + error + "\nTip: " + tip);
         }
     }
 }

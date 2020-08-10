@@ -1,0 +1,4 @@
+0 givep	0
+1 givep	1
+2 call	add
+3 store	x regRetv

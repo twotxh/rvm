@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+
 namespace RobinScript
 {
     class Tools
@@ -15,6 +16,10 @@ namespace RobinScript
         public static void CompileRuntime(string Line)
         {
             Interpreter.Compute(Parser.Parse(Lexer.Lex(new string[] { Line })));
+        }
+        public static void Run(string Path)
+        {
+            Interpreter.Compute(Bytecode.Parse(File.ReadAllText(Path)));
         }
     }
 }
