@@ -22,14 +22,12 @@ namespace RobinScript
     public struct Class
     {
         public string Name { get; set; }
-        public AdressMode Adress { get; set; }
         public Parameter[] Parameters { get; set; }
         public Bytecode Code { get; set; }
     }
     public struct Function
     {
         public string Name { get; set; }
-        public AdressMode Adress { get; set; }
         public Parameter[] Parameters { get; set; }
         public Bytecode Code { get; set; }
         public DataType Type { get; set; }
@@ -37,8 +35,7 @@ namespace RobinScript
     public struct Variable
     {
         public string Name { get; set; }
-        public object Value { get; set; } // make a setter for fix values (take the fix values from oldscript.cs)
-        public AdressMode Adress { get; set; }
+        public object Value { get; set; }
         public Bytecode Code { get; set; }
         public DataType Type { get; set; }
     }
@@ -46,7 +43,6 @@ namespace RobinScript
     {
         public string ID { get; set; }
         public object Value { get; set; }
-        public AdressMode Adress { get; set; }
         public DataType Type { get; set; }
     }
     public class LocalMemory

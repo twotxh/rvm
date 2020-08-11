@@ -14,8 +14,9 @@ namespace RobinScript
                     Console.Title = "RobinScript";
                     Welcome();
                     while (true) {
-                        Console.Write(":: ");
-                        Console.WriteLine(Bytecode.Parse(Console.ReadLine()));
+                        //Console.Write(":: ");
+                        Interpreter.Compute(Bytecode.Parse(File.ReadAllText(@"C:\Users\Mondelli\Desktop\RobinScript\RobinScript\Test\RobinScript.rc")));
+                        Console.ReadLine();
                         /*try { Tools.CompileRuntime(Console.ReadLine()); } catch (Error) { }*/
                     }
                     break;

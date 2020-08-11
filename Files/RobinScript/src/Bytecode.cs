@@ -4,19 +4,17 @@ using System.Collections.Generic;
 namespace RobinScript
 {
     public enum Istructions {
-        GIVEP,
-        CALL,
-        STORE,
-        JUMP,
-        EVAL,
-        TAKE,
+        CALL, // call functions giving parameters
+        STORE, // storing <arg1> in the memory using an id (var name)
+        JUMP, // go to a specific istruction given in <arg0> (id of istruction [int])
+                
     }
     public class Bytecode
     {
         public List<Block> Current = new List<Block>();
         public void Append(string lineNumber, Istructions istruction, string[] arguments)
         {
-            //Current.Add(new Block() { IstructionNumber = int.Parse(lineNumber), Arguments = arguments, Istruction = istruction });
+            Current.Add(new Block() { IstructionNumber = int.Parse(lineNumber), Arguments = arguments, Istruction = istruction });
         }
         public static Bytecode Parse(string bytecode)
         {
@@ -25,24 +23,26 @@ namespace RobinScript
             for (int i = 0; i < code.Length; i++) {
                 if (string.IsNullOrWhiteSpace(code[i])) continue;
                 string text = code[i].Substring(code[i].IndexOf("\t")+1);
-                string[] arguments = new string[10];
+                List<string> arguments = new List<string>();
                 bool isInterpolate = false;
-                int count = 0;
+                string word = "";
                 for (int j = 0; j < text.Length; j++) {
                     if (text[j] == '\'') {
                         isInterpolate = (isInterpolate) ? false : true;
-                        arguments[count] += '\'';
+                        word += '\'';
                     }
                     else if (isInterpolate) {
-                        arguments[count] += text[j];
+                        word += text[j];
                     } else if (text[j] == ' ' && !isInterpolate) {
-                        if (!string.IsNullOrWhiteSpace(arguments[count]))
-                            count++;
+                        if (!string.IsNullOrWhiteSpace(word)) {
+                            arguments.Add(word);
+                            word = "";
+                        }
                     } else {
-                        arguments[count] += text[j];
+                        word += text[j];
                     }
                 }
-                BTTable.Append(code[i].Split(' ')[0], (Istructions) Enum.Parse(typeof(Istructions), code[i].Split('\t')[0].Split(' ')[1].ToUpper()), arguments);
+                BTTable.Append(code[i].Split(' ')[0], (Istructions) Enum.Parse(typeof(Istructions), code[i].Split('\t')[0].Split(' ')[1].ToUpper()), arguments.ToArray());
             }
             return BTTable;
         }
