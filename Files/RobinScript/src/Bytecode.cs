@@ -10,7 +10,6 @@ namespace RobinScript
         JUMP,
         EVAL,
         TAKE,
-
     }
     public class Bytecode
     {
