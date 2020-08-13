@@ -3,6 +3,7 @@
 - Name: RobinScript
 - Date: 14/07/20 - 10:15
 - Common Extention: .rsc <br>
+- [JOIN IN THE DISCORD SERVER](https://discord.gg/9ApKh2U)
 ***A fast Interpreted language, syntactically designed by me. Robin Script (Ext: .rsc ). This project will be written in C#.Net, in a VisualStudio solution (Ext: .sln), that can be downloaded and edited by anyone. The commits will not be accepted, but I will gladly watch them.***
 _________________________________
 # How To Use
