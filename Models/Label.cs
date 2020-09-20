@@ -3,10 +3,10 @@
     public Instruction[] Instructions;
 }
 struct Group {
-    public Group(Bytecode.compute[] instructions, object[][] arguments) {
+    public Group(Bytecode.compute[] instructions, dynamic[][] arguments) {
         Instructions = instructions;
         Arguments = arguments;
     }
     public Bytecode.compute[] Instructions;
-    public object[][] Arguments;
+    public dynamic[][] Arguments;
 }
