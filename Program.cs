@@ -10,10 +10,10 @@ class Program {
             new Instruction(Runtime.RvmOutput, null),
         };
         Instruction[] add = new Instruction[] {
-            new Instruction(Runtime.LoadFP, new dynamic[] { 1 }),
-            new Instruction(Runtime.StoreFP, new dynamic[] { 0, 0 }),
-            new Instruction(Runtime.AddF, new dynamic[] { 0 }),
-            new Instruction(Runtime.ReturnF, new dynamic[] { 0 }),
+            new Instruction(Runtime.LoadFromPar, new dynamic[] { 1 }),
+            new Instruction(Runtime.StoreFromPar, new dynamic[] { 0, 0 }),
+            new Instruction(Runtime.AddFromLod, new dynamic[] { 0 }),
+            new Instruction(Runtime.ReturnFromStorage, new dynamic[] { 0 }),
         };
         Rvm.Execute(new Group[] {
             new Group() {Instructions = main},
