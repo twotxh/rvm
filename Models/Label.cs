@@ -1,12 +1,4 @@
-﻿struct Label {
-    public int Length => Instructions.Length;
+﻿struct Group {
+    public Group(Instruction[] instructions) => Instructions = instructions;
     public Instruction[] Instructions;
-}
-struct Group {
-    public Group(Bytecode.compute[] instructions, dynamic[][] arguments) {
-        Instructions = instructions;
-        Arguments = arguments;
-    }
-    public Bytecode.compute[] Instructions;
-    public dynamic[][] Arguments;
 }

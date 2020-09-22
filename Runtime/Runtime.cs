@@ -1,7 +1,8 @@
 using System;
 
 class Runtime {
-    static Storage storage = new Storage();
+    public delegate void compute(dynamic[] args);
+    public static Storage storage = new Storage();
     public static int InstructionIndex = 0;
     public static Group[] Labels;
     public static void StoreF(dynamic[] args) => storage[args[0]] = Registers.lod[0];

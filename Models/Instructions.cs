@@ -1,8 +1,8 @@
 ﻿struct Instruction {
-    public Instruction(string instruction, dynamic[] args) {
+    public Instruction(Runtime.compute instruction, dynamic[] args) {
         this.instruction = instruction;
         this.arguments = args;
     }
-    public string instruction;
+    public Runtime.compute instruction;
     public dynamic[] arguments;
 }

@@ -1,23 +1,25 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 
 class Program {
     static void Main(string[] args) {
-        BytecodeBuilder bytecode = new BytecodeBuilder();
-        bytecode.AppendInstruction("store", new dynamic[] { 0, "1\n" });
-        bytecode.AppendInstruction("loadf", new dynamic[] { 0 });
-        bytecode.AppendInstruction("rvm_out", null);
-        bytecode.AppendInstruction("call", new dynamic[] { 1 });
-        bytecode.AppendInstruction("loadf", new dynamic[] { 0 });
-        bytecode.AppendInstruction("rvm_out", null);
-        bytecode.AppendLabel();
-        bytecode.AppendInstruction("push", null);
-        bytecode.AppendInstruction("store", new dynamic[] { 0, "2\n" });
-        bytecode.AppendInstruction("loadf", new dynamic[] { 0 });
-        bytecode.AppendInstruction("rvm_out", null);
-        bytecode.AppendInstruction("pop", null);
-        bytecode.AppendLabel();
-        Rvm.Execute(bytecode.Build().GenerateExecutions());
+        Instruction[] main = new Instruction[] {
+            new Instruction(Runtime.Store, new dynamic[] { 0, 100 }),
+            new Instruction(Runtime.Call, new dynamic[] { 1 }),
+        };
+        Instruction[] store = new Instruction[] {
+            new Instruction(Runtime.Store, new dynamic[] { 0, 100 }),
+            new Instruction(Runtime.Call, new dynamic[] { 2 }),
+        };
+        Instruction[] f1 = new Instruction[] {
+            new Instruction(Runtime.Store, new dynamic[] { 0, 100 }),
+        };
+        Rvm.Execute(new Group[] {
+            new Group() {Instructions = main},
+            new Group() {Instructions = store},
+            new Group() {Instructions = f1},
+        });
         //Stopwatch s = new Stopwatch();
         //s.Start();
         //s.Stop();
