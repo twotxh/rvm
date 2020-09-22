@@ -5,20 +5,19 @@ using System.Diagnostics;
 class Program {
     static void Main(string[] args) {
         Instruction[] main = new Instruction[] {
-            new Instruction(Runtime.Store, new dynamic[] { 0, 100 }),
+            new Instruction(Runtime.Pass, new dynamic[] { 10, 2 }),
             new Instruction(Runtime.Call, new dynamic[] { 1 }),
+            new Instruction(Runtime.RvmOutput, null),
         };
-        Instruction[] store = new Instruction[] {
-            new Instruction(Runtime.Store, new dynamic[] { 0, 100 }),
-            new Instruction(Runtime.Call, new dynamic[] { 2 }),
-        };
-        Instruction[] f1 = new Instruction[] {
-            new Instruction(Runtime.Store, new dynamic[] { 0, 100 }),
+        Instruction[] add = new Instruction[] {
+            new Instruction(Runtime.LoadFP, new dynamic[] { 1 }),
+            new Instruction(Runtime.StoreFP, new dynamic[] { 0, 0 }),
+            new Instruction(Runtime.AddF, new dynamic[] { 0 }),
+            new Instruction(Runtime.ReturnF, new dynamic[] { 0 }),
         };
         Rvm.Execute(new Group[] {
             new Group() {Instructions = main},
-            new Group() {Instructions = store},
-            new Group() {Instructions = f1},
+            new Group() {Instructions = add},
         });
         //Stopwatch s = new Stopwatch();
         //s.Start();

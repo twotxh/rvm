@@ -6,9 +6,11 @@ class Runtime {
     public static int InstructionIndex = 0;
     public static Group[] Labels;
     public static void StoreF(dynamic[] args) => storage[args[0]] = Registers.lod[0];
+    public static void StoreFP(dynamic[] args) => storage[args[0]] = Registers.par[args[1]];
     public static void Store(dynamic[] args) => storage[args[0]] = args[1];
     public static void Call(dynamic[] args) => Rvm.ExecuteLabel(Labels[args[0]]);
     public static void Load(dynamic[] args) => Registers.lod = args;
+    public static void LoadFP(dynamic[] args) => Registers.lod = new dynamic[] { Registers.par[args[0]] };
     public static void LoadF(dynamic[] args) {
         Registers.lod = new dynamic[args.Length];
         for (int i = 0; i < args.Length; i++)
@@ -19,8 +21,21 @@ class Runtime {
     public static void Div(dynamic[] args) => storage[args[0]] /= args[1];
     public static void Mul(dynamic[] args) => storage[args[0]] *= args[1];
     public static void Pow(dynamic[] args) => Math.Pow(storage[args[0]], args[0]);
+    public static void AddF(dynamic[] args) => storage[args[0]] += Registers.lod[0];
+    public static void SubF(dynamic[] args) => storage[args[0]] -= Registers.lod[0];
+    public static void DivF(dynamic[] args) => storage[args[0]] /= Registers.lod[0];
+    public static void MulF(dynamic[] args) => storage[args[0]] *= Registers.lod[0];
+    public static void PowF(dynamic[] args) => Math.Pow(storage[args[0]], Registers.lod[0]);
+    public static void AddFS(dynamic[] args) => storage[args[0]] += storage[args[1]];
+    public static void SubFS(dynamic[] args) => storage[args[0]] -= storage[args[1]];
+    public static void DivFS(dynamic[] args) => storage[args[0]] /= storage[args[1]];
+    public static void MulFS(dynamic[] args) => storage[args[0]] *= storage[args[1]];
+    public static void PowFS(dynamic[] args) => Math.Pow(storage[args[0]], storage[args[1]]);
     public static void RvmOutput(dynamic[] args) => Console.Write(Registers.lod[0]);
     public static void RvmInput(dynamic[] args) => Registers.lod = new dynamic[] { Console.ReadLine() };
+    public static void ReturnF(dynamic[] args) => Registers.lod = new dynamic[] { storage[args[0]] };
+    public static void Return(dynamic[] args) => Registers.lod = new dynamic[] { args[0] };
+    public static void Pass(dynamic[] args) => Registers.par = args;
     public static void Compare(dynamic[] args) {
         if (Registers.lod[0] == Registers.lod[1])
             Registers.lod = new dynamic[] { 0 };
