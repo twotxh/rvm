@@ -1,5 +1,5 @@
 using System;
-
+using System.Diagnostics;
 class Runtime {
     public delegate void compute(dynamic[] args);
     public static Storage storage = new Storage();
@@ -31,8 +31,10 @@ class Runtime {
     public static void DivFromStorage(dynamic[] args) => storage[args[0]] /= storage[args[1]];
     public static void MulFromStorage(dynamic[] args) => storage[args[0]] *= storage[args[1]];
     public static void PowFromStorage(dynamic[] args) => Math.Pow(storage[args[0]], storage[args[1]]);
-    public static void RvmOutput(dynamic[] args) => Console.Write(Registers.lod[0]);
+    public static void RvmOutput(dynamic[] args) => Console.Write(string.Join("", Registers.par));
     public static void RvmInput(dynamic[] args) => Registers.lod = new dynamic[] { Console.ReadLine() };
+    public static void RvmShellFromPar(dynamic[] args) => Process.Start(new ProcessStartInfo() { FileName = "cmd", Arguments = "/C "+ string.Join(" ", args)+" "+string.Join(" ", Registers.par), UseShellExecute = false });
+    public static void RvmShell(dynamic[] args) => Process.Start(new ProcessStartInfo() { FileName = "cmd", Arguments = "/C " + string.Join(" ", args), UseShellExecute = false });
     public static void ReturnFromStorage(dynamic[] args) {InstructionIndex = 10000000; Registers.lod = new dynamic[] { storage[args[0]] };}
     public static void Return(dynamic[] args) {InstructionIndex = 10000000; Registers.lod = new dynamic[] { args[0] };}
     public static void PassFromLod(dynamic[] args) => Registers.par = Registers.lod;
