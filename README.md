@@ -5,7 +5,7 @@ ___________
 ###### 🟦 RVM is a fast program -> don't worry, c# doesn't make execution, slow!<br>
 ###### 🟦 RVM is a experimental and simple product -> it doesn't use switch statement, increasing instructions performing!<br>
 ___________
-###### ***-🟩 That's how bytecode is managed by vm:***
+###### ***🟩 That's how bytecode is managed by vm:***
 - ___Models___
 > - `Group` is a class contains all loaded into vm instructions in a `Instruction` array(Stored in `Models/Label.cs`)
 > - `Instruction` is a class contains the delegate to perform and some arguments (Stored in `Models/Instructions.cs`)
