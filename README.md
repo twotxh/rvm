@@ -6,7 +6,6 @@ ___________
 ###### 🟦 RVM is a experimental and simple product -> it doesn't use switch statement, increasing instructions performing!<br>
 ___________
 ###### ***➡ That's how bytecode is managed by vm:***
-___________
 - ___Models___
 > - `Group` is a class contains all loaded into vm instructions in a `Instruction` array(Stored in `Models/Label.cs`)
 > - `Instruction` is a class contains the delegate to perform and some arguments (Stored in `Models/Instructions.cs`)
@@ -18,7 +17,6 @@ ___________
 > - `Rvm` is a static class contains main methods to execute labels or main label (at index 0) (Stored in `Runtime/Rvm.cs`)
 ___________
 ###### ***➡ That's how bytecode instructions are performed by vm:***
-___________
 - `Rvm` contains `ExecuteLabel`, takes `Group` as parameter and with a `for` indexes all instructions contained in an array performing it one by one taking from `Group label.Instructions[InstructionIndex]` delegate to perform and passing to it at the same class location the arguments -> `label.Instructions[InstructionIndex].Instruction(label.Instructions[InstructionIndex].Arguments)`
 - `Rvm.ExecuteLabel` besides performs instructions contained in the label passed as parameter, pushes the old storage onto the stack, and instances a new `Storage` into the old to reset it and change its adress to avoid ambiguos behaviours, and restores it once finished reassigning the old value to the new storage variable
 ___________
