@@ -47,14 +47,10 @@ class Runtime {
     public static void Compare(dynamic[] args) {
         if (Registers.lod[0] == Registers.lod[1])
             Registers.lod = new dynamic[] { 0 };
-        else {
-            double f = Registers.lod[0];
-            double s = Registers.lod[1];
-            if (f > s)
-                Registers.lod = new dynamic[] { 1 };
-            if (f < s)
-                Registers.lod = new dynamic[] { 2 };
-        }
+        else if (Registers.lod[0] > Registers.lod[1])
+            Registers.lod = new dynamic[] { 1 };
+        else if (Registers.lod[0] < Registers.lod[1])
+            Registers.lod = new dynamic[] { 2 };
     }
     public static void Nop(dynamic[] args) { }
     public static void End(dynamic[] args) => Environment.Exit(0);
