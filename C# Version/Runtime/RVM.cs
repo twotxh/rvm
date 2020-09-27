@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Diagnostics;
-class Rvm {
+public static class Rvm {
     public static void Execute(Group[] labels) {
         Runtime.Labels = labels;
         ExecuteLabel(labels[0]);

@@ -1,4 +1,4 @@
-﻿struct Instruction {
+﻿public struct Instruction {
     public Instruction(Runtime.compute instruction, dynamic[] args) {
         this.instruction = instruction;
         this.arguments = args;

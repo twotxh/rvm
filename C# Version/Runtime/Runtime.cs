@@ -1,6 +1,6 @@
 using System;
 using System.Diagnostics;
-class Runtime {
+public static class Runtime {
     public delegate void compute(dynamic[] args);
     public static Storage storage = new Storage();
     public static int InstructionIndex = 0;
