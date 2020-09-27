@@ -20,7 +20,7 @@ class Program {
             Instruction.New(Runtime.RvmOutput), //10
         };
         var program = new Group[] {
-            new Group() {Instructions = main},
+            Group.New(main),
         };
         Console.WriteLine(DateTime.Now);
         Rvm.Execute(program);
