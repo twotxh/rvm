@@ -13,10 +13,30 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
+    <Filter Include="File di origine\Models">
+      <UniqueIdentifier>{44db6843-2b91-4e46-a282-f1ee191e8821}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="File di origine\Runtime">
+      <UniqueIdentifier>{03f6e2b4-5406-41cc-93d6-6b4e55b1faa1}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="rvm_cpp.cpp">
+    <ClCompile Include="Program.cpp">
       <Filter>File di origine</Filter>
     </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Label.h">
+      <Filter>File di origine\Models</Filter>
+    </ClInclude>
+    <ClInclude Include="Instruction.h">
+      <Filter>File di origine\Models</Filter>
+    </ClInclude>
+    <ClInclude Include="Runtime.h">
+      <Filter>File di origine\Runtime</Filter>
+    </ClInclude>
+    <ClInclude Include="Rvm.h">
+      <Filter>File di origine\Runtime</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

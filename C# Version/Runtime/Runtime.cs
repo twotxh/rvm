@@ -1,7 +1,8 @@
 using System;
 using System.Diagnostics;
 public static class Runtime {
-    public delegate void compute(dynamic[] args);
+    public delegate void runtime(dynamic[] args);
+    public delegate void builtinCall();
     public static Storage storage = new Storage();
     public static int InstructionIndex = 0;
     public static Group[] Labels;
@@ -35,6 +36,7 @@ public static class Runtime {
     public static void RvmInput(dynamic[] args) => Registers.lod = new dynamic[] { Console.ReadLine() };
     public static void RvmShellFromPar(dynamic[] args) => Process.Start(new ProcessStartInfo() { FileName = "cmd", Arguments = "/C "+ string.Join(" ", args)+" "+string.Join(" ", Registers.par), UseShellExecute = false });
     public static void RvmShell(dynamic[] args) => Process.Start(new ProcessStartInfo() { FileName = "cmd", Arguments = "/C " + string.Join(" ", args), UseShellExecute = false });
+    public static void RvmCall(dynamic[] args) => Registers.par[0]();
     public static void ReturnFromStorage(dynamic[] args) {InstructionIndex = 10000000; Registers.lod = new dynamic[] { storage[args[0]] };}
     public static void Return(dynamic[] args) {InstructionIndex = 10000000; Registers.lod = new dynamic[] { args[0] };}
     public static void PassFromLod(dynamic[] args) => Registers.par = Registers.lod;
