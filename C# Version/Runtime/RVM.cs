@@ -1,6 +1,10 @@
 ﻿using System;
 using System.Diagnostics;
 public static class Rvm {
+    /// <summary>
+    /// Performs first label of <paramref name="labels"/>
+    /// </summary>
+    /// <param name="labels">Functions</param>
     public static void Execute(Group[] labels) {
         Runtime.Labels = labels;
         ExecuteLabel(labels[0]);
