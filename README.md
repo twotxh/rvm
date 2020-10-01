@@ -11,7 +11,6 @@ ___________
 > - `Instruction` is a class contains the delegate to perform and some arguments (Stored in `Models/Instructions.cs`)
 - ___Virtual Components___
 > - `Storage` is a class, works as a virtual component ex(Virtual Heap) and be initialized in `Runtime` static class at the start of the program with `1000` spaces (Stored in `VirtualComponents/Storage.cs`)
-> - `Registers` is a static class contains virtual registers into load and unload values like `lod`, general purpose, and `par`, parameters passing purpose (Stored in `VirtualComponents/Registers.cs`)
 - ___Runtime___
 > - `Runtime` is a static class contains all runtime executable instructions, storage initialization and instruction index counter (Stored in `Runtime/Runtime.cs`)
 > - `Rvm` is a static class contains main methods to execute labels or main label (at index 0) (Stored in `Runtime/Rvm.cs`)
