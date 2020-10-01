@@ -5,6 +5,8 @@ class Program {
             Instruction.New(Runtime.Load, 0),
             Instruction.New(Runtime.Load, new string[1] { "ciao" }),
             Instruction.New(Runtime.LoadElementFromArray),
+            Instruction.New(Runtime.Store, 0),
+            Instruction.New(Runtime.LoadFromStorage, 0),
             Instruction.New(Runtime.RvmOutput)
         };
         var program = new Group[] {
