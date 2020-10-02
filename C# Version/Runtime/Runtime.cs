@@ -61,19 +61,19 @@ public static class Runtime {
     /// Adds last element with second last and pushes it onto the stack
     /// </summary>
     /// <param name="args"></param>
-    public static void Add(dynamic args) => Stack.Push(Stack.Pop() + Stack.Pop());
+    public static void Add(dynamic args) { dynamic p = Stack.Pop(); Stack.Push(Stack.Pop() + p); }
 
     /// <summary>
     /// Subs last element with second last and pushes it onto the stack
     /// </summary>
     /// <param name="args"></param>
-    public static void Sub(dynamic args) => Stack.Push(Stack.Pop() - Stack.Pop());
+    public static void Sub(dynamic args) { dynamic p = Stack.Pop(); Stack.Push(Stack.Pop() - p); }
 
     /// <summary>
     /// Divides last element with second last and pushes it onto the stack
     /// </summary>
     /// <param name="args"></param>
-    public static void Div(dynamic args) => Stack.Push(Stack.Pop() / Stack.Pop());
+    public static void Div(dynamic args) { dynamic p = Stack.Pop(); Stack.Push(Stack.Pop() / p); }
 
     /// <summary>
     /// Multiplies last element with second last and pushes it onto the stack
@@ -85,7 +85,7 @@ public static class Runtime {
     /// Does the power between last element and second last and pushes it onto the stack
     /// </summary>
     /// <param name="args"></param>
-    public static void Pow(dynamic args) => Stack.Push(Math.Pow(Stack.Pop(), Stack.Pop()));
+    public static void Pow(dynamic args) { dynamic p = Stack.Pop(); Stack.Push(Math.Pow(Stack.Pop(), p)); }
 
     /// <summary>
     /// Prints the last element onto the stack into the console
@@ -133,13 +133,13 @@ public static class Runtime {
     /// Compares last two elements onto the stack and pushes true if last is greater than second last or false
     /// </summary>
     /// <param name="args"></param>
-    public static void CompareGreater(dynamic args) => Stack.Push(Stack.Pop() > Stack.Pop());
+    public static void CompareGreater(dynamic args) => Stack.Push(Stack.Pop() < Stack.Pop());
 
     /// <summary>
     /// Compares last two elements onto the stack and pushes true if last is less than second last or false
     /// </summary>
     /// <param name="args"></param>
-    public static void CompareLess(dynamic args) => Stack.Push(Stack.Pop() < Stack.Pop());
+    public static void CompareLess(dynamic args) => Stack.Push(Stack.Pop() > Stack.Pop());
 
     /// <summary>
     /// Compares last two elements onto the stack and pushes true if are not equals or false
