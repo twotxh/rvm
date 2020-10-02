@@ -1,12 +1,10 @@
 ﻿using System;
 class Program {
-    static void makewhatiwant() {
-        Console.WriteLine("");
-    }
     static void Main(string[] args) {
         var main = new Instruction[] {
-            Instruction.New(Runtime.Load, new Runtime.builtinCall(makewhatiwant)),
-            Instruction.New(Runtime.RvmCall)
+            Instruction.New(Runtime.Load, "true"),
+            Instruction.New(Runtime.CastToBool),
+            Instruction.New(Runtime.RvmOutput)
         };
         var program = new Group[] {
             Group.New(main),

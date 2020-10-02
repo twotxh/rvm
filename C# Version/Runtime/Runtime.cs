@@ -10,6 +10,24 @@ public static class Runtime {
     public static Stack<dynamic> Stack = new Stack<dynamic>();
 
     /// <summary>
+    /// Casts last element onto the stack to int32 and push result
+    /// </summary>
+    /// <param name="args"></param>
+    public static void CastToInt(dynamic args) => Stack.Push(Convert.ToInt32(Stack.Pop()));
+
+    /// <summary>
+    /// Casts last element onto the stack to float and push result
+    /// </summary>
+    /// <param name="args"></param>
+    public static void CastToFloat(dynamic args) => Stack.Push(Convert.ToSingle(Stack.Pop()));
+
+    /// <summary>
+    /// Casts last element onto the stack to bool and push result
+    /// </summary>
+    /// <param name="args"></param>
+    public static void CastToBool(dynamic args) => Stack.Push(Convert.ToBoolean(Stack.Pop()));
+
+    /// <summary>
     /// Stores the value onto the stack in the local heap
     /// </summary>
     /// <param name="args">Index of the local heap into store last stack element</param>
