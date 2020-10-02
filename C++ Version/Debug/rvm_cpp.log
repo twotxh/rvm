@@ -1,9 +1,0 @@
-﻿  rvm_cpp.cpp
-  The contents of <any> are available only with C++17 or later.
-C:\Users\Mondelli\Desktop\rvm\rvm\src\C++ Version\rvm_cpp.cpp(4,7): error C2039: 'any': non è un membro di 'std'
-C:\Users\Mondelli\Desktop\rvm\rvm\src\C++ Version\predefined C++ types (compiler internal)(417): message : vedere la dichiarazione di 'std'
-C:\Users\Mondelli\Desktop\rvm\rvm\src\C++ Version\rvm_cpp.cpp(4,11): error C2065: 'any': identificatore non dichiarato
-C:\Users\Mondelli\Desktop\rvm\rvm\src\C++ Version\rvm_cpp.cpp(4,11): error C2146: errore di sintassi: ';' mancante prima dell'identificatore 'd'
-C:\Users\Mondelli\Desktop\rvm\rvm\src\C++ Version\rvm_cpp.cpp(4,11): error C2065: 'd': identificatore non dichiarato
-C:\Users\Mondelli\Desktop\rvm\rvm\src\C++ Version\rvm_cpp.cpp(5,2): error C2065: 'd': identificatore non dichiarato
-C:\Users\Mondelli\Desktop\rvm\rvm\src\C++ Version\rvm_cpp.cpp(6,2): error C2065: 'd': identificatore non dichiarato

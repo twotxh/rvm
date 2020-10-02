@@ -1,2 +1,0 @@
-C:\Users\Mondelli\Desktop\rvm\rvm\src\C++ Version\Debug\rvm_cpp.exe
-C:\Users\Mondelli\Desktop\rvm\rvm\src\C++ Version\Debug\rvm_cpp.pdb
