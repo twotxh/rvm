@@ -1,7 +1,4 @@
-<p align="center">
-  <img src="Extra/robin.ico" />
-  <h1>Robin Virtual Machine 0.9</h1>
-</p>
+<p align="center"> <img src="Extra/robin.ico" /> <h1>Robin Virtual Machine 0.9
 ___________
 ###### 🟦 RVM is a bytecode simple virtual machine -> provides you tools to make and perform bytecode instructions!<br>
 ###### 🟦 RVM is a pointer based vm -> it uses c# delegates (c++ pointers) to performs instructions!<br>
