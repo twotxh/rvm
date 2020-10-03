@@ -1,4 +1,4 @@
-# 💻RobinVirtualMachine💻
+![RobinVirtualMachine](Extra/robin.ico) # Robin Virtual Machine 0.9
 ___________
 ###### 🟦 RVM is a bytecode simple virtual machine -> provides you tools to make and perform bytecode instructions!<br>
 ###### 🟦 RVM is a pointer based vm -> it uses c# delegates (c++ pointers) to performs instructions!<br>

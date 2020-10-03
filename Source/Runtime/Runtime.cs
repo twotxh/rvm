@@ -190,6 +190,42 @@ public static class Runtime {
     }
 
     /// <summary>
+    /// Pops last element of the stack and jump to <paramref name="args"/> if false
+    /// </summary>
+    /// <param name="args">Index of instruction to jump on</param>
+    public static void SkipTrue(dynamic args) {
+        if (Stack.Pop())
+            InstructionIndex += args;
+    }
+
+    /// <summary>
+    /// Pops last element of the stack and jump to <paramref name="args"/> if false
+    /// </summary>
+    /// <param name="args">Index of instruction to jump on</param>
+    public static void SkipFalse(dynamic args) {
+        if (!Stack.Pop())
+            InstructionIndex += args;
+    }
+
+    /// <summary>
+    /// Pops last element of the stack and jump to <paramref name="args"/> if false
+    /// </summary>
+    /// <param name="args">Index of instruction to jump on</param>
+    public static void BackTrue(dynamic args) {
+        if (Stack.Pop())
+            InstructionIndex -= args;
+    }
+
+    /// <summary>
+    /// Pops last element of the stack and jump to <paramref name="args"/> if false
+    /// </summary>
+    /// <param name="args">Index of instruction to jump on</param>
+    public static void BackFalse(dynamic args) {
+        if (!Stack.Pop())
+            InstructionIndex -= args;
+    }
+
+    /// <summary>
     /// Jumps to <paramref name="args"/>
     /// </summary>
     /// <param name="args">Number of instruction to jump on</param>

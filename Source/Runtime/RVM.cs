@@ -6,6 +6,7 @@ public static class Rvm {
     /// </summary>
     /// <param name="labels">Functions</param>
     public static void Execute(Group[] labels) {
+        Console.Title = "Robin";
         Runtime.Labels = labels;
         ExecuteLabel(labels[0]);
     }
