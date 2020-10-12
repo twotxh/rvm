@@ -1,0 +1,3 @@
+C:/Users/Mondelli/Desktop/rvm/rvm/cpp/out/build/x64-Release/CMakeFiles/rvm.dir
+C:/Users/Mondelli/Desktop/rvm/rvm/cpp/out/build/x64-Release/CMakeFiles/edit_cache.dir
+C:/Users/Mondelli/Desktop/rvm/rvm/cpp/out/build/x64-Release/CMakeFiles/rebuild_cache.dir

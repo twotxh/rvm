@@ -1,8 +1,6 @@
-rvm.csproj.user
-rvm.sln
-.vscode/
-.vs/
-bin/
-obj/
-robin.ico
-robin.png
+cs/rvm.csproj.user
+cs/rvm.sln
+cs/.vscode/
+cs/.vs/
+cs/bin/
+cs/obj/
