@@ -1,0 +1,27 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2012/06/nuspec.xsd">
+  <metadata>
+    <id>rvm</id>
+    <version>0.9.0</version>
+    <authors>Carpal</authors>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <license type="file">LICENSE</license>
+    <licenseUrl>https://aka.ms/deprecateLicenseUrl</licenseUrl>
+    <icon>robin.png</icon>
+    <projectUrl>https://github.com/Carpall/rvm/</projectUrl>
+    <description>RobinVirtualMachine library</description>
+    <releaseNotes>First release</releaseNotes>
+    <tags>virtuamachine vm robin</tags>
+    <repository type="GitHub OpenSource Public" url="https://github.com/Carpall/rvm/" />
+    <dependencies>
+      <group targetFramework=".NETCoreApp3.1" />
+    </dependencies>
+  </metadata>
+  <files>
+    <file src="C:\Users\Mondelli\Desktop\rvm\rvm\bin\Debug\netcoreapp3.1\rvm.runtimeconfig.json" target="lib\netcoreapp3.1\rvm.runtimeconfig.json" />
+    <file src="C:\Users\Mondelli\Desktop\rvm\rvm\bin\Debug\netcoreapp3.1\rvm.dll" target="lib\netcoreapp3.1\rvm.dll" />
+    <file src="C:\Users\Mondelli\Desktop\rvm\rvm\bin\Debug\netcoreapp3.1\rvm.xml" target="lib\netcoreapp3.1\rvm.xml" />
+    <file src="C:\Users\Mondelli\Desktop\rvm\rvm\robin.png" target="robin.png" />
+    <file src="C:\Users\Mondelli\Desktop\rvm\rvm\src\LICENSE" target="LICENSE" />
+  </files>
+</package>
