@@ -3,17 +3,23 @@ using System.Diagnostics;
 using System.Collections.Generic;
 public static class Runtime {
     public delegate void runtime(dynamic args);
-    public delegate void builtinCall();
     public static Storage storage = new Storage();
     public static int InstructionIndex = 0;
     public static Group[] Labels;
-    public static Stack<dynamic> Stack = new Stack<dynamic>();
+    public static readonly Stack<dynamic> Stack = new Stack<dynamic>();
+    public static readonly List<string> Functions = new List<string>();
 
     /// <summary>
     /// Casts last element onto the stack to int32 and push result
     /// </summary>
     /// <param name="args"></param>
     public static void CastToInt(dynamic args) => Stack.Push(Convert.ToInt32(Stack.Pop()));
+
+    /// <summary>
+    /// Casts last element onto the stack to int32 and push result
+    /// </summary>
+    /// <param name="args"></param>
+    public static void Cast(dynamic args) => Stack.Push(Convert.ChangeType(Stack.Pop(), args));
 
     /// <summary>
     /// Casts last element onto the stack to float and push result
@@ -37,7 +43,7 @@ public static class Runtime {
     /// Calls a function
     /// </summary>
     /// <param name="args">Index of function to call</param>
-    public static void Call(dynamic args) => Rvm.ExecuteLabel(Labels[args]);
+    public static void Call(dynamic args) => Rvm.ExecuteLabel(Labels[Functions.IndexOf(args)]);
 
     /// <summary>
     /// Loads onto the stack a constant
