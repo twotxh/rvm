@@ -11,7 +11,7 @@ class Program {
             Instruction.New(Runtime.CastToInt),
             Instruction.New(Console.Write, "Insert another number: "),
             Instruction.New(Runtime.RvmInput),
-            Instruction.New(Runtime.Cast, typeof(int)),
+            Instruction.New(Runtime.Cast<int>),
 
             Instruction.New(Console.Write, "Choose an operation: [a:add, s:sub, m:mul, d:div, p:pow] > "),
             Instruction.New(Runtime.RvmInput),

@@ -19,7 +19,7 @@ public static class Runtime {
     /// Casts last element onto the stack to int32 and push result
     /// </summary>
     /// <param name="args"></param>
-    public static void Cast(dynamic args) => Stack.Push(Convert.ChangeType(Stack.Pop(), args));
+    public static void Cast<T>(dynamic args) => Stack.Push(Convert.ChangeType(Stack.Pop(), typeof(T)));
 
     /// <summary>
     /// Casts last element onto the stack to float and push result
