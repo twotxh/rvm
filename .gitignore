@@ -3,7 +3,6 @@ cs/rvm.sln
 cs/.vscode/
 cs/.vs/
 cs/bin/
-cs/obj/
-cpp/out/
-cpp/rvm/
-cpp/.vs/
+cpp/x64/
+cpp/rvm.sln
+cpp/.vs
