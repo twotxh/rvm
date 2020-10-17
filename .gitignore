@@ -3,5 +3,6 @@ rvm.sln
 .vscode/
 .vs/
 bin/
-rust_v/target/
-rust_v/Cargo.lock
+src_cpp/cmake-build-debug/
+src_cpp/.idea/
+src_cpp/.vscode/
