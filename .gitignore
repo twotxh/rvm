@@ -3,3 +3,5 @@ rvm.sln
 .vscode/
 .vs/
 bin/
+rust_v/target/
+rust_v/Cargo.lock
