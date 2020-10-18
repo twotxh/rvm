@@ -1,5 +1,5 @@
 ﻿#include <vector>
-#include "rvm.cpp"
+#include "rvm.h"
 int main() {
     Int x = 10;
     std::cout<<x.to_int();

@@ -2,24 +2,8 @@
 
   <PropertyGroup>
     <OutputType>exe</OutputType>
-	<DocumentationFile>bin\Release\netcoreapp3.1\rvm.xml</DocumentationFile>
-    <TargetFramework>netcoreapp3.1</TargetFramework>
-    <AssemblyVersion>0.9.0.0</AssemblyVersion>
-    <ApplicationIcon>robin.ico</ApplicationIcon>
-    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-    <PackageIcon>robin.png</PackageIcon>
-    <Description>RobinVirtualMachine library</Description>
-    <Product>RobinVirtualMachine</Product>
-    <Company>.</Company>
-    <Authors>Carpal</Authors>
-    <Version>0.9</Version>
-    <Copyright />
-    <PackageLicenseFile>LICENSE</PackageLicenseFile>
-    <PackageProjectUrl>https://github.com/Carpall/rvm/</PackageProjectUrl>
-    <RepositoryUrl>https://github.com/Carpall/rvm/</RepositoryUrl>
-    <RepositoryType>GitHub OpenSource Public</RepositoryType>
-    <PackageTags>virtuamachine vm robin</PackageTags>
-    <PackageReleaseNotes>First release</PackageReleaseNotes>
+	<DocumentationFile>bin\Debug\net5.0\rvm.xml</DocumentationFile>
+    <TargetFramework>net5.0</TargetFramework>
     <NeutralLanguage />
   </PropertyGroup>
 

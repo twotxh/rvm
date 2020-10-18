@@ -58,23 +58,23 @@ public:
     int value = 0;
     RuntimeObject add(RuntimeObject obj) override {
         value += obj.to_int();
-        return Int(value);
+        return *this;
     }
     RuntimeObject add(int val) override {
         value += val;
-        return Int(value);
+        return *this;
     }
     RuntimeObject sub(int val) override {
         value -= val;
-        return Int(value);
+        return *this;
     }
     RuntimeObject mul(int val) override {
         value *= val;
-        return Int(value);
+        return *this;
     }
     RuntimeObject div(int val) override {
         value /= val;
-        return Int(value);
+        return *this;
     }
     int to_int() override {
         return value;

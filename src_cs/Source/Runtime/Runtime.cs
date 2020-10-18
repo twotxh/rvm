@@ -139,7 +139,7 @@ public static class Runtime {
     /// Pops the last element of the stack
     /// </summary>
     /// <param name="args"></param>
-    public static void Pop(dynamic args) => Stack.Pop();
+    public static void Unload(dynamic args) => Stack.Pop();
 
     /// <summary>
     /// Breaks function executing returning to previous

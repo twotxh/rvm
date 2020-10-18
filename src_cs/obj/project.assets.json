@@ -1,44 +1,36 @@
 {
   "version": 3,
   "targets": {
-    ".NETCoreApp,Version=v3.1": {}
+    "net5.0": {}
   },
   "libraries": {},
   "projectFileDependencyGroups": {
-    ".NETCoreApp,Version=v3.1": []
+    "net5.0": []
   },
   "packageFolders": {
-    "C:\\Users\\Mondelli\\.nuget\\packages\\": {},
-    "C:\\Program Files\\dotnet\\sdk\\NuGetFallbackFolder": {}
+    "C:\\Users\\Mondelli\\.nuget\\packages\\": {}
   },
   "project": {
-    "version": "0.9.0",
+    "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\Mondelli\\Desktop\\rvm\\rvm\\rvm.csproj",
+      "projectUniqueName": "C:\\Users\\Mondelli\\Desktop\\rvm\\src_cs\\rvm.csproj",
       "projectName": "rvm",
-      "projectPath": "C:\\Users\\Mondelli\\Desktop\\rvm\\rvm\\rvm.csproj",
+      "projectPath": "C:\\Users\\Mondelli\\Desktop\\rvm\\src_cs\\rvm.csproj",
       "packagesPath": "C:\\Users\\Mondelli\\.nuget\\packages\\",
-      "outputPath": "C:\\Users\\Mondelli\\Desktop\\rvm\\rvm\\obj\\",
+      "outputPath": "C:\\Users\\Mondelli\\Desktop\\rvm\\src_cs\\obj\\",
       "projectStyle": "PackageReference",
-      "fallbackFolders": [
-        "C:\\Program Files\\dotnet\\sdk\\NuGetFallbackFolder"
-      ],
       "configFilePaths": [
-        "C:\\Users\\Mondelli\\AppData\\Roaming\\NuGet\\NuGet.Config",
-        "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
+        "C:\\Users\\Mondelli\\AppData\\Roaming\\NuGet\\NuGet.Config"
       ],
       "originalTargetFrameworks": [
-        "netcoreapp3.1"
+        "net5.0"
       ],
       "sources": {
-        "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
-        "https://nuget.pkg.github.com/Carpall/index.json": {},
-        "https://www.nuget.org/api/v2/": {},
-        "https://www.nuget.org/packages/Discord.Net/2.2.0": {}
+        "https://api.nuget.org/v3/index.json": {}
       },
       "frameworks": {
-        "netcoreapp3.1": {
-          "targetAlias": "netcoreapp3.1",
+        "net5.0": {
+          "targetAlias": "net5.0",
           "projectReferences": {}
         }
       },
@@ -49,8 +41,8 @@
       }
     },
     "frameworks": {
-      "netcoreapp3.1": {
-        "targetAlias": "netcoreapp3.1",
+      "net5.0": {
+        "targetAlias": "net5.0",
         "imports": [
           "net461",
           "net462",
@@ -61,18 +53,12 @@
         ],
         "assetTargetFallback": true,
         "warn": true,
-        "downloadDependencies": [
-          {
-            "name": "Microsoft.AspNetCore.App.Ref",
-            "version": "[3.1.2, 3.1.2]"
-          }
-        ],
         "frameworkReferences": {
           "Microsoft.NETCore.App": {
             "privateAssets": "all"
           }
         },
-        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\5.0.100-rc.1.20452.10\\RuntimeIdentifierGraph.json"
+        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\5.0.100-rc.2.20479.15\\RuntimeIdentifierGraph.json"
       }
     }
   }

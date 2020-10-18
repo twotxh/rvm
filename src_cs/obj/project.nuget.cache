@@ -1,10 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "oledf8+wqjTZzJ0yxWpndY1hvqoQZqiWTD0R9eI8BCAnHarvFFVAry0gUZ+87N4QdbfMVUXDU1v+SbZUBJSBqA==",
+  "dgSpecHash": "NASA1ORSJSNuP+7oEwBQZvp22xcmUVj18prQMb6yw2sBgZ7KwKK4gts4KWsyOnJbM5+7nd91vmwB4IRn77on4Q==",
   "success": true,
-  "projectFilePath": "C:\\Users\\Mondelli\\Desktop\\rvm\\rvm\\rvm.csproj",
-  "expectedPackageFiles": [
-    "C:\\Users\\Mondelli\\.nuget\\packages\\microsoft.aspnetcore.app.ref\\3.1.2\\microsoft.aspnetcore.app.ref.3.1.2.nupkg.sha512"
-  ],
+  "projectFilePath": "C:\\Users\\Mondelli\\Desktop\\rvm\\src_cs\\rvm.csproj",
+  "expectedPackageFiles": [],
   "logs": []
 }
