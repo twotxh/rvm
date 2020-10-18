@@ -1,33 +1,45 @@
-﻿#include "rvm.h"
+﻿#include <vector>
+#include "rvm.h"
+class Int : RuntimeObject {
+    int value = 0;
+    void add(RuntimeObject obj) override {
+        value += obj.to_int();
+    }
+    void add(int val) override {
+        value += val;
+    }
+    void sub(int val) override {
+        value -= val;
+    }
+    void mul(int val) override {
+        value *= val;
+    }
+    void div(int val) override {
+        value /= val;
+    }
+    int to_int() override {
+        return value;
+    }
+    enum type type() override {
+        return type::_int;
+    }
+};
+void put(RuntimeObject chr) {
+    std::cout.put(chr.to_char());
+}
 int main() {
-   const std::vector<instruction> main = {
-      instruction(runtime::load, '!'),
-      instruction(runtime::load, 'd'),
-      instruction(runtime::load, 'l'),
-      instruction(runtime::load, 'r'),
-      instruction(runtime::load, 'o'),
-      instruction(runtime::load, 'W'),
-      instruction(runtime::load, ' '),
-      instruction(runtime::load, 'o'),
-      instruction(runtime::load, 'l'),
-      instruction(runtime::load, 'l'),
-      instruction(runtime::load, 'e'),
-      instruction(runtime::load, 'H'),
-      instruction(runtime::rvm_outputc),
-      instruction(runtime::rvm_outputc),
-      instruction(runtime::rvm_outputc),
-      instruction(runtime::rvm_outputc),
-      instruction(runtime::rvm_outputc),
-      instruction(runtime::rvm_outputc),
-      instruction(runtime::rvm_outputc),
-      instruction(runtime::rvm_outputc),
-      instruction(runtime::rvm_outputc),
-      instruction(runtime::rvm_outputc),
-      instruction(runtime::rvm_outputc),
-      instruction(runtime::rvm_outputc),
-   };
-   group program[] {
-      group(main, "main")
-   };
-   rvm::execute(program);
+
+    const std::vector<instruction> main = {
+        instruction(rvm::runtime::call, 1),
+        instruction(rvm::runtime::ret),
+    };
+    const std::vector<instruction> printhelloro = {
+        instruction(rvm::runtime::load, Int()),
+        instruction(rvm::runtime::ret),
+    };
+    std::vector<group> program {
+        group(main),
+        group(printhelloro),
+    };
+    rvm::execute(program);
 }

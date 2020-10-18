@@ -1,11 +1,12 @@
+#include "runtime_object.h"
 struct instruction {
-   void (*fpointer)(int);
-   int argument = 0;
-   instruction(void (*function)(int), int arg) {
+   void (*fpointer)(RuntimeObject);
+   RuntimeObject argument;
+   instruction(void (*function)(RuntimeObject), RuntimeObject arg) {
        fpointer = function;
        argument = arg;
    }
-   instruction(void (*function)(int)) {
+   instruction(void (*function)(RuntimeObject)) {
        fpointer = function;
    }
 };
