@@ -1,0 +1,19 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>exe</OutputType>
+	<DocumentationFile>bin\Release\netcoreapp3.1\rvm.xml</DocumentationFile>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
+    <NeutralLanguage />
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Remove="src\**" />
+    <EmbeddedResource Remove="src\**" />
+    <None Remove="src\**" />
+  </ItemGroup>
+
+  <Target Name="PreBuild" BeforeTargets="PreBuildEvent">
+  </Target>
+
+</Project>
