@@ -1,5 +1,8 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
+
 public static class Rvm {
     /// <summary>
     /// Performs main function of <paramref name="program"/>
@@ -29,6 +32,33 @@ public static class Rvm {
         Runtime.storage = x0;
         Runtime.InstructionIndex = x1;
     }
+    struct Token
+    {
+        public static string[] KeyWords = new string[] {"load", "call", "ret"};
+        public enum tokenKind
+        {
+            Identifier,
+            ConstString,
+            OpenBrace,
+            CloseBrace,
+            Colon,
+            ConstInt,
+            OpCode
+        }
+        readonly public tokenKind Kind;
+        readonly public string Value;
+        public Token(tokenKind kind, string value)
+        {
+            Kind = kind;
+            Value = value;
+        }
+        public Token(tokenKind kind)
+        {
+            Kind = kind;
+            Value = null;
+        }
+        public override string ToString() => "@Kind: " + Kind + " @Value: " + Value;
+    }
     /// <summary>
     /// Returns a program performable by Execute(Function[])<br/>
     /// <code>
@@ -37,11 +67,57 @@ public static class Rvm {
     /// </code>
     /// </summary>
     /// <param name="code"></param>
-    public static void CompileJit(string code)
+    public static Function[] CompileJit(string code)
     {
+        List<Function> functions = new List<Function>();
+        Token[] tokens = tokenize(code);
+        Console.WriteLine(string.Join('\n', tokens));
+        for (int i = 0; i < tokens.Length; i++)
+        {
+            if (tokens[i].Kind == Token.tokenKind.Identifier && tokens[i+1].Kind == Token.tokenKind.OpenBrace)
+            functions.Add();
+        }
+        return functions.ToArray();
+    }
+    static Token[] tokenize(string code)
+    {
+        List<Token> tokens = new List<Token>();
+        string token = "";
+        bool str = false;
         for (int i = 0; i < code.Length; i++)
         {
-            // tokenizer and loader
+            if (str)
+            {
+                token += code[i];
+                if (code[i] == '"' && code[i - 1] != '\\')
+                {
+                    tokens.Add(new Token(Token.tokenKind.ConstString, token));
+                    token = "";
+                    str = false;
+                }
+            }
+            else
+            {
+                if (char.IsLetterOrDigit(code[i]))
+                    token += code[i];
+                else
+                {
+                    if (token.Length != 0)
+                    {
+                        tokens.Add(new Token(isConst(token), token));
+                        token = "";
+                    }
+                    switch (code[i])
+                    {
+                        case ':': tokens.Add(new Token(Token.tokenKind.Colon)); break;
+                        case '{': tokens.Add(new Token(Token.tokenKind.OpenBrace)); break;
+                        case '}': tokens.Add(new Token(Token.tokenKind.CloseBrace)); break;
+                        case '"': token += '"'; str = true; break;
+                    }
+                }
+            }
         }
+        return tokens.ToArray();
     }
+    static Token.tokenKind isConst(string token) => char.IsDigit(token[0]) ? Token.tokenKind.ConstInt : (Token.KeyWords.Contains(token) ? Token.tokenKind.OpCode : Token.tokenKind.Identifier);
 }
