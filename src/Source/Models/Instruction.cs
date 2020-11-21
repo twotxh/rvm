@@ -1,10 +1,15 @@
-﻿public struct Instruction {
-    public Instruction(Runtime.runtime instruction, dynamic args) {
-        this.instruction = instruction;
-        this.arguments = args;
+﻿namespace RobinVM.Models
+{
+    public struct Instruction
+    {
+        public Instruction(Runtime.runtime functionPointer, object argument)
+        {
+            this.FunctionPointer = functionPointer;
+            this.Argument = argument;
+        }
+        public static Instruction New(Runtime.runtime functionPointer, object argument) => new Instruction(functionPointer, argument);
+        public static Instruction New(Runtime.runtime functionPointer) => new Instruction(functionPointer, null);
+        public Runtime.runtime FunctionPointer;
+        public object Argument;
     }
-    public static Instruction New(Runtime.runtime instruction, dynamic arg) => new Instruction(instruction, arg);
-    public static Instruction New(Runtime.runtime instruction) => new Instruction(instruction, null);
-    public Runtime.runtime instruction;
-    public dynamic arguments;
 }
