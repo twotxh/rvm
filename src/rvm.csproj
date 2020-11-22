@@ -1,9 +1,9 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <OutputType>exe</OutputType>
+    <OutputType>library</OutputType>
 	<DocumentationFile>bin\Release\netcoreapp3.1\rvm.xml</DocumentationFile>
-    <TargetFramework>netcoreapp3.1</TargetFramework>
+    <TargetFramework>net5.0</TargetFramework>
     <NeutralLanguage />
   </PropertyGroup>
 
