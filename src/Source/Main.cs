@@ -1,26 +1,25 @@
-﻿using RobinVM;
+﻿using Lang;
+using RobinVM;
 using RobinVM.Models;
 using System;
 using System.Diagnostics;
 
 namespace Lang
 {
-    class Runtime
+    static class RuntimeExt
     {
-        public static void AddString(object nill)
+        public static void Print()
         {
-            RobinVM.Runtime.Stack.Push((string)RobinVM.Runtime.Stack.Pop()+RobinVM.Runtime.Stack.Pop());
         }
     }
 }
 
-class Program {
+class Program {    
     static void Main() {
         Instruction[] main =
         {
-            Instruction.New(Runtime.Load, "ciao"),
-            Instruction.New(Runtime.Load, " mondo\n"),
-            Instruction.New(Lang.Runtime.AddString),
+            Instruction.New(Runtime.Load, (Runtime.CallPointer)RuntimeExt.Print),
+            Instruction.New(Runtime.RvmCall),
             Instruction.New(Runtime.Return)
         };
         Function[] program =
@@ -31,6 +30,6 @@ class Program {
         sw.Start();
         Robin.Execute(program);
         sw.Stop();
-        Console.WriteLine("Elapsed: {0}ms", sw.ElapsedMilliseconds);
+        Console.WriteLine($"Elapsed: {sw.ElapsedMilliseconds}ms");
     }
 }

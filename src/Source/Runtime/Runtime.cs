@@ -39,6 +39,11 @@ namespace RobinVM
         public static void CastToBool(object args) => Stack.Push(Convert.ToBoolean(Stack.Pop()));
 
         /// <summary>
+        /// Casts last element onto the stack to string and push result
+        /// </summary>
+        /// <param name="args"></param>
+        public static void CastToString(object args) => Stack.Push(Stack.Pop().ToString());
+        /// <summary>
         /// Stores the value onto the stack in the local heap
         /// </summary>
         /// <param name="args">Index of the local heap into store last stack element</param>
@@ -93,31 +98,82 @@ namespace RobinVM
         /// Adds last element with second last and pushes it onto the stack
         /// </summary>
         /// <param name="args"></param>
-        public static void Add(object args) { dynamic p = Stack.Pop(); Stack.Push(Stack.Pop()+p); }
+        public static void Add(object args)
+        {
+            object p = Stack.Pop();
+            object p1 = Stack.Pop();
+            if (p.GetType() != p1.GetType())
+                throw new NotSupportedException("Cannot perform operation `Add` between types `" + p1.GetType() + "` & `"+p.GetType()+"`");
+            if (p is string) Stack.Push((string)p1 + (string)p);
+            else if (p is byte) Stack.Push((byte)p1 + (byte)p);
+            else if (p is short) Stack.Push((short)p1 + (short)p);
+            else if (p is int) Stack.Push((int)p1 + (int)p);
+            else if (p is long) Stack.Push((long)p1 + (long)p);
+            else if (p is float) Stack.Push((float)p1 + (float)p);
+            else if (p is double) Stack.Push((double)p1 + (double)p);
+            else if (p is decimal) Stack.Push((decimal)p1 + (decimal)p);
+            else throw new NotSupportedException("Cannot perform operation `Add` with type `" + p1.GetType() + "`");
+        }
 
         /// <summary>
         /// Subs last element with second last and pushes it onto the stack
         /// </summary>
         /// <param name="args"></param>
-        public static void Sub(object args) { dynamic p = Stack.Pop(); Stack.Push(Stack.Pop() - p); }
+        public static void Sub(object args)
+        {
+            object p = Stack.Pop();
+            object p1 = Stack.Pop();
+            if (p.GetType() != p1.GetType())
+                throw new NotSupportedException("Cannot perform operation `Sub` between types `" + p1.GetType() + "` & `" + p.GetType() + "`");
+            if (p is byte) Stack.Push((byte)p1 - (byte)p);
+            else if (p is short) Stack.Push((short)p1 + (short)p);
+            else if (p is int) Stack.Push((int)p1 - (int)p);
+            else if (p is long) Stack.Push((long)p1 - (long)p);
+            else if (p is float) Stack.Push((float)p1 - (float)p);
+            else if (p is double) Stack.Push((double)p1 - (double)p);
+            else if (p is decimal) Stack.Push((decimal)p1 - (decimal)p);
+            else throw new NotSupportedException("Cannot perform operation `Sub` with type `" + p1.GetType() + "`");
+        }
 
         /// <summary>
         /// Divides last element with second last and pushes it onto the stack
         /// </summary>
         /// <param name="args"></param>
-        public static void Div(object args) { dynamic p = Stack.Pop(); Stack.Push(Stack.Pop() / p); }
+        public static void Div(object args)
+        {
+            object p = Stack.Pop();
+            object p1 = Stack.Pop();
+            if (p.GetType() != p1.GetType())
+                throw new NotSupportedException("Cannot perform operation `Div` between types `" + p1.GetType() + "` & `" + p.GetType() + "`");
+            if (p is byte) Stack.Push((byte)p1 / (byte)p);
+            else if (p is short) Stack.Push((short)p1 / (short)p);
+            else if (p is int) Stack.Push((int)p1 / (int)p);
+            else if (p is long) Stack.Push((long)p1 / (long)p);
+            else if (p is float) Stack.Push((float)p1 / (float)p);
+            else if (p is double) Stack.Push((double)p1 / (double)p);
+            else if (p is decimal) Stack.Push((decimal)p1 / (decimal)p);
+            else throw new NotSupportedException("Cannot perform operation `Div` with type `" + p1.GetType() + "`");
+        }
 
         /// <summary>
         /// Multiplies last element with second last and pushes it onto the stack
         /// </summary>
         /// <param name="args"></param>
-        public static void Mul(object args) => Stack.Push((dynamic)Stack.Pop() * Stack.Pop());
-
-        /// <summary>
-        /// Does the power between last element and second last and pushes it onto the stack
-        /// </summary>
-        /// <param name="args"></param>
-        public static void Pow(object args) { double p = (double)Stack.Pop(); Stack.Push(Math.Pow((double)Stack.Pop(), p)); }
+        public static void Mul(object args)
+        {
+            object p = Stack.Pop();
+            object p1 = Stack.Pop();
+            if (p.GetType() != p1.GetType())
+                throw new NotSupportedException("Cannot perform operation `Mul` between types `" + p1.GetType() + "` & `" + p.GetType() + "`");
+            if (p is byte) Stack.Push((byte)p1 * (byte)p);
+            else if (p is short) Stack.Push((short)p1 * (short)p);
+            else if (p is int) Stack.Push((int)p1 * (int)p);
+            else if (p is long) Stack.Push((long)p1 * (long)p);
+            else if (p is float) Stack.Push((float)p1 * (float)p);
+            else if (p is double) Stack.Push((double)p1 * (double)p);
+            else if (p is decimal) Stack.Push((decimal)p1 * (decimal)p);
+            else throw new NotSupportedException("Cannot perform operation `Mul` with type `" + p1.GetType() + "`");
+        }
 
         /// <summary>
         /// Prints the last element onto the stack into the console
@@ -165,25 +221,53 @@ namespace RobinVM
         /// Compares last two elements onto the stack and pushes true if are equals or false
         /// </summary>
         /// <param name="args"></param>
-        public static void CompareEQ(object args) => Stack.Push(Stack.Pop() == Stack.Pop());
+        public static void CompareEQ(object args) => Stack.Push(Stack.Pop().Equals(Stack.Pop()));
 
         /// <summary>
         /// Compares last two elements onto the stack and pushes true if last is greater than second last or false
         /// </summary>
         /// <param name="args"></param>
-        public static void CompareGreater(object args) => Stack.Push((dynamic)Stack.Pop() < Stack.Pop());
+        public static void CompareGreater(object args)
+        {
+            object p = Stack.Pop();
+            object p1 = Stack.Pop();
+            if (p.GetType() != p1.GetType())
+                throw new NotSupportedException("Cannot perform operation `CompareGreater` between types `" + p1.GetType() + "` & `" + p.GetType() + "`");
+            if (p is byte) Stack.Push((byte)p1 > (byte)p);
+            else if (p is short) Stack.Push((short)p1 > (short)p);
+            else if (p is int) Stack.Push((int)p1 > (int)p);
+            else if (p is long) Stack.Push((long)p1 > (long)p);
+            else if (p is float) Stack.Push((float)p1 > (float)p);
+            else if (p is double) Stack.Push((double)p1 > (double)p);
+            else if (p is decimal) Stack.Push((decimal)p1 > (decimal)p);
+            else throw new NotSupportedException("Cannot perform operation `CompareGreater` with type `" + p1.GetType() + "`");
+        }
 
         /// <summary>
         /// Compares last two elements onto the stack and pushes true if last is less than second last or false
         /// </summary>
         /// <param name="args"></param>
-        public static void CompareLess(object args) => Stack.Push((dynamic)Stack.Pop() > Stack.Pop());
+        public static void CompareLess(object args)
+        {
+            object p = Stack.Pop();
+            object p1 = Stack.Pop();
+            if (p.GetType() != p1.GetType())
+                throw new NotSupportedException("Cannot perform operation `CompareLess` between types `" + p1.GetType() + "` & `" + p.GetType() + "`");
+            if (p is byte) Stack.Push((byte)p1 < (byte)p);
+            else if (p is short) Stack.Push((short)p1 < (short)p);
+            else if (p is int) Stack.Push((int)p1 < (int)p);
+            else if (p is long) Stack.Push((long)p1 < (long)p);
+            else if (p is float) Stack.Push((float)p1 < (float)p);
+            else if (p is double) Stack.Push((double)p1 < (double)p);
+            else if (p is decimal) Stack.Push((decimal)p1 < (decimal)p);
+            else throw new NotSupportedException("Cannot perform operation `CompareLess` with type `" + p1.GetType() + "`");
+        }
 
         /// <summary>
         /// Compares last two elements onto the stack and pushes true if are not equals or false
         /// </summary>
         /// <param name="args"></param>
-        public static void CompareNEQ(object args) => Stack.Push((dynamic)Stack.Pop() != Stack.Pop());
+        public static void CompareNEQ(object args) => Stack.Push(!Stack.Pop().Equals(Stack.Pop()));
 
         /// <summary>
         /// Exits from the program
