@@ -1,35 +1,37 @@
-﻿using Lang;
-using RobinVM;
+﻿using RobinVM;
 using RobinVM.Models;
 using System;
-using System.Diagnostics;
 
-namespace Lang
+class BenchmarkMethods
 {
-    static class RuntimeExt
+    public void Test()
     {
-        public static void Print()
-        {
-        }
+    }
+    public void Test1()
+    {
+    }
+    public void Test3()
+    {
     }
 }
-
-class Program {    
-    static void Main() {
-        Instruction[] main =
+class Test
+{
+    public static Function[] program = null;
+    static void Main()
+    {
+        var main = new Instruction[]
         {
-            Instruction.New(Runtime.Load, (Runtime.CallPointer)RuntimeExt.Print),
-            Instruction.New(Runtime.RvmCall),
+            Instruction.New(Runtime.Load, "Hello World"),
+            Instruction.New(Runtime.RvmOutput),
             Instruction.New(Runtime.Return)
         };
-        Function[] program =
+        program = new Function[]
         {
             Function.New(main, "main")
         };
-        Stopwatch sw = new Stopwatch();
-        sw.Start();
+        var msStart = DateTime.Now.Ticks;
         Robin.Execute(program);
-        sw.Stop();
-        Console.WriteLine($"Elapsed: {sw.ElapsedMilliseconds}ms");
+        var msEnd = DateTime.Now.Ticks-42000; // overhead
+        Console.WriteLine($"\n\nMs: {(msEnd-msStart)/10000}, Ticks: {msEnd-msStart}");
     }
 }
