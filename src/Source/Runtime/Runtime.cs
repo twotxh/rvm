@@ -1,6 +1,7 @@
 using System;
 using System.Diagnostics;
 using System.Collections.Generic;
+using RobinVM.Models;
 
 namespace RobinVM
 {
@@ -11,7 +12,7 @@ namespace RobinVM
         public static object[] storage = new object[256];
         public static int InstructionIndex = 0;
         public static Models.Function[] RuntimeFunctions;
-        public static readonly Stack<object> Stack = new Stack<object>();
+        public static readonly RStack Stack = new RStack(16);
         public static readonly List<string> SwitchFunctions = new List<string>();
 
         /// <summary>
@@ -47,7 +48,7 @@ namespace RobinVM
         /// Stores the value onto the stack in the local heap
         /// </summary>
         /// <param name="args">Index of the local heap into store last stack element</param>
-        public static void Store(object args) => storage[(byte)args] = Stack.Pop();
+        public static void Store(object args) => storage[Convert.ToByte(args)] = Stack.Pop();
 
         /// <summary>
         /// Calls a function
@@ -92,7 +93,7 @@ namespace RobinVM
         /// Loads from local heap onto the stack
         /// </summary>
         /// <param name="args">Index of local heap to load</param>
-        public static void LoadFromStorage(object args) => Stack.Push(storage[(byte)args]);
+        public static void LoadFromStorage(object args) => Stack.Push(storage[Convert.ToByte(args)]);
 
         /// <summary>
         /// Adds last element with second last and pushes it onto the stack
@@ -203,7 +204,7 @@ namespace RobinVM
         /// Pops the last element of the stack
         /// </summary>
         /// <param name="args"></param>
-        public static void Unload(object args) => Stack.Pop();
+        public static void Unload(object args) => Stack.PopNR();
 
         /// <summary>
         /// Dupplicates the last element of the stack
