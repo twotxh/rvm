@@ -2,9 +2,10 @@
 
   <PropertyGroup>
     <OutputType>exe</OutputType>
-	<DocumentationFile>bin\Release\netcoreapp3.1\rvm.xml</DocumentationFile>
+	
     <TargetFramework>netcoreapp3.1</TargetFramework>
     <NeutralLanguage />
+    <Platforms>AnyCPU;x64</Platforms>
   </PropertyGroup>
 
 </Project>

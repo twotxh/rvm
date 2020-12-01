@@ -1,6 +1,8 @@
 ﻿using RobinVM;
 using RobinVM.Models;
 using System;
+using System.Diagnostics;
+
 class Test
 {
     static void CompareLOE_Int(object args)
@@ -17,14 +19,9 @@ class Test
     {
         Runtime.Stack.Push((int)Runtime.Stack.Pop() + (int)Runtime.Stack.Pop());
     }
-    static int Fib(int n)
-    {
-        if (n <= 1)
-            return n;
-        return Fib(n-1)+Fib(n-2);
-    }
     static void Main()
     {
+        var timer = new Stopwatch();
         var fib = new Instruction[]
         {
             Instruction.New(Runtime.Store, 0),
@@ -47,9 +44,15 @@ class Test
         };
         var main = new Instruction[]
         {
-            Instruction.New(Runtime.Load, 28),
+            Instruction.New(Console.WriteLine, "The program calculates the N° num of fibonacci series!"),
+            Instruction.New(Console.Write, "N°: "),
+            Instruction.New(Runtime.RvmInput),
+            Instruction.New(Runtime.CastToInt),
             Instruction.New(Runtime.Call, "fib"),
+            Instruction.New(Console.Write, "The N° num: "),
             Instruction.New(Runtime.RvmOutput),
+            Instruction.New(Console.Write, '\n'),
+            Instruction.New(Runtime.Jump, 1),
             Instruction.New(Runtime.Return)
         };
         var program = new Function[]
@@ -57,10 +60,6 @@ class Test
             Function.New(main, "main"),
             Function.New(fib, "fib"),
         };
-        var msStart = DateTime.Now.Ticks;
-        //Console.WriteLine(Fib(20));
         Robin.Execute(program);
-        var msEnd = DateTime.Now.Ticks-90000; // datetime, stloc, ld overhead
-        Console.WriteLine($"\nS: {(msEnd - msStart) / 10000000}, Ms: {(msEnd-msStart)/10000}, Ticks: {msEnd-msStart}");
     }
 }
