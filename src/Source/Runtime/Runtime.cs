@@ -7,13 +7,12 @@ namespace RobinVM
 {
     public static class Runtime
     {
-        public delegate void runtime(object args);
+        public delegate void RuntimePointer(object args);
         public delegate void CallPointer();
-        public static object[] storage = new object[256];
-        public static int InstructionIndex = 0;
-        public static Models.Function[] RuntimeFunctions;
+        public static object[] Storage = new object[byte.MaxValue];
+        public static int ProgramCounter = 0;
+        public static Image RuntimeImage;
         public static readonly RStack Stack = new RStack(16);
-        public static readonly List<string> SwitchFunctions = new List<string>();
 
         /// <summary>
         /// Casts last element onto the stack to int32 and push result
@@ -48,13 +47,13 @@ namespace RobinVM
         /// Stores the value onto the stack in the local heap
         /// </summary>
         /// <param name="args">Index of the local heap into store last stack element</param>
-        public static void Store(object args) => storage[Convert.ToByte(args)] = Stack.Pop();
+        public static void Store(object args) => Storage[Convert.ToByte(args)] = Stack.Pop();
 
         /// <summary>
         /// Calls a function
         /// </summary>
         /// <param name="args">Index of function to call</param>
-        public static void Call(object args) => Robin.ExecuteLabel(RuntimeFunctions[SwitchFunctions.IndexOf((string)args)]);
+        public static void Call(object args) => Robin.ExecuteLabel(RuntimeImage.FindFunction((string)args));
 
         /// <summary>
         /// Loads onto the stack a constant
@@ -63,15 +62,27 @@ namespace RobinVM
         public static void Load(object args) => Stack.Push(args);
 
         /// <summary>
+        /// Loads onto the stack a global variable
+        /// </summary>
+        /// <param name="args">global variable id</param>
+        public static void LoadGlobal(object args) => Stack.Push(((Dictionary<string, object>)Stack.Pop())[(string)args]);
+
+        /// <summary>
+        /// Loads onto the stack a global variable
+        /// </summary>
+        /// <param name="args">global variable id</param>
+        public static void LoadRuntimeImage(object args) => Stack.Push(RuntimeImage.GetCacheTable());
+
+        /// <summary>
         /// Takes last element on the stack as array, the second last as index of the element to change and tird last as value to replace with,
         /// changes the value and push it onto the stack
         /// </summary>
         /// <param name="args"></param>
         /// <typeparam name="T">Type of array<br/>Example: int[] => StoreElementIntoArray&lt;int&gt;()</typeparam>
-        public static void StoreElementIntoArray<T>(object args)
+        public static void StoreElementIntoArray(object args)
         {
             object arr = Stack.Pop();
-            ((T[])arr)[(int)Stack.Pop()] = (T)Stack.Pop();
+            ((object[])arr)[(int)Stack.Pop()] = Stack.Pop();
             Stack.Push(arr);
         }
 
@@ -81,7 +92,7 @@ namespace RobinVM
         /// </summary>
         /// <param name="args"></param>
         /// <typeparam name="T">Type of array<br/>Example: int[] => StoreElementIntoArray&lt;int&gt;()</typeparam>
-        public static void LoadElementFromArray<T>(object args) => Stack.Push(((T[])Stack.Pop())[(int)Stack.Pop()]);
+        public static void LoadElementFromArray(object args) => Stack.Push(((object[])Stack.Pop())[(int)Stack.Pop()]);
 
         /// <summary>
         /// Clears stack
@@ -93,7 +104,7 @@ namespace RobinVM
         /// Loads from local heap onto the stack
         /// </summary>
         /// <param name="args">Index of local heap to load</param>
-        public static void LoadFromStorage(object args) => Stack.Push(storage[Convert.ToByte(args)]);
+        public static void LoadFromStorage(object args) => Stack.Push(Storage[Convert.ToByte(args)]);
 
         /// <summary>
         /// Adds last element with second last and pushes it onto the stack
@@ -216,7 +227,7 @@ namespace RobinVM
         /// Breaks function executing returning to previous
         /// </summary>
         /// <param name="args"></param>
-        public static void Return(object args) => InstructionIndex = int.MaxValue-1;
+        public static void Return(object args) => ProgramCounter = int.MaxValue-1;
 
         /// <summary>
         /// Compares last two elements onto the stack and pushes true if are equals or false
@@ -283,7 +294,7 @@ namespace RobinVM
         public static void JumpTrue(object args)
         {
             if ((bool)Stack.Pop())
-                InstructionIndex = (int)args - 1;
+                ProgramCounter = (int)args - 1;
         }
 
         /// <summary>
@@ -293,7 +304,7 @@ namespace RobinVM
         public static void JumpFalse(object args)
         {
             if (!(bool)Stack.Pop())
-                InstructionIndex = (int)args - 1;
+                ProgramCounter = (int)args - 1;
         }
 
         /// <summary>
@@ -303,7 +314,7 @@ namespace RobinVM
         public static void SkipTrue(object args)
         {
             if ((bool)Stack.Pop())
-                InstructionIndex += (int)args;
+                ProgramCounter += (int)args;
         }
 
         /// <summary>
@@ -313,7 +324,7 @@ namespace RobinVM
         public static void SkipFalse(object args)
         {
             if (!(bool)Stack.Pop())
-                InstructionIndex += (int)args;
+                ProgramCounter += (int)args;
         }
 
         /// <summary>
@@ -323,7 +334,7 @@ namespace RobinVM
         public static void BackTrue(object args)
         {
             if ((bool)Stack.Pop())
-                InstructionIndex -= (int)args;
+                ProgramCounter -= (int)args;
         }
 
         /// <summary>
@@ -333,13 +344,13 @@ namespace RobinVM
         public static void BackFalse(object args)
         {
             if (!(bool)Stack.Pop())
-                InstructionIndex -= (int)args;
+                ProgramCounter -= (int)args;
         }
 
         /// <summary>
         /// Jumps to <paramref name="args"/>
         /// </summary>
         /// <param name="args">Number of instruction to jump on</param>
-        public static void Jump(object args) => InstructionIndex = (int)args - 1;
+        public static void Jump(object args) => ProgramCounter = (int)args - 1;
     }
 }

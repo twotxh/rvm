@@ -2,24 +2,24 @@
 	"test"
 .end
 
-.var "myglobal" str
+.var "myglobal"
     "Result of [23, 2]: "
 .end
 
-.fun "main" void
+.ctor
     load:img                ; push current module onto the stack
     load:var "myglobal"
     load:c 23
     load:c 2
     new:list i32 2          ; instantiate a new list of type i32 of size 2 
-    call "add([i32]) i32"
-    call "getstr(i32) str"
-    call "cnctstr(str, str) str"
-    call "print(str) void"  ; output: Result of [23, 2]: 25
+    call "add(.)"
+    call "getstr(.)"
+    call "cnctstr(..)"
+    call "print(.)"  ; output: Result of [23, 2]: 25
     ret
 .end
 
-.fun "add([i32])" i32
+.fun "add(.)"
     load:c 0
     store:loc 0
     load:arg 0

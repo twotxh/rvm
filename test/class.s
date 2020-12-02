@@ -3,10 +3,10 @@
 .end
 
 .obj "person"
-    .var "name" str null .end
-    .var "surname" str null .end
-    .var "age" i32 null .end
-    .var "title" str null .end
+    .var "name" null .end
+    .var "surname" null .end
+    .var "age" null .end
+    .var "title" null .end
     .ctor
         load:arg 0
         load:arg 1
@@ -22,36 +22,36 @@
         store:var "title"
         ret
     .end
-    .fun "about(self)" void
+    .fun "about(.)"
         load:c "Hi, my name is "
         load:arg 0
         load:var "name"
-        call "cnctstr(str, str) str"
+        call "cnctstr(..)"
         load:c " "
         load:arg 0
         load:var "surname"
-        call "cnctstr(str, str) str"
+        call "cnctstr(..)"
         load:c ", i am "
         load:arg 0
         load:var "age"
-        call "cnctstr(str, str) str"
+        call "cnctstr(..)"
         load:c " and so i am a "
         load:arg 0
         load:var "title"
-        call "cnctstr(str, str) str"
+        call "cnctstr(..)"
 
-        call "cnctstr(str, str) str"
-        call "print(str) void"
+        call "cnctstr(..)"
+        call "print(.)"
         ret
     .end
 .end
 
-.fun "main" void
+.ctor ; main
     load:c "n"
     load:c "s"
     load:c 0
     load:c "baby"
     new:obj "person"
-    call "about(self)"
+    call "about(.)"
     ret
 .end
