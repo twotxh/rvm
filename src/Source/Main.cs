@@ -4,25 +4,26 @@ using System;
 using System.Diagnostics;
 using System.Runtime.InteropServices;
 using System.Collections.Generic;
+
+class Person
+{
+    public string Name = null;
+    public Person(string name)
+    {
+        this.Name = name;
+    }
+    public void About()
+    {
+        Console.WriteLine("My name is: "+this.Name);
+    }
+}
+
+
 class Test
 {
     static void Main()
     {
-        /*
-         * TEXT:
-         *  .img "source" .end
-         *  
-         *  .var "myglobal"
-         *      10
-         *  .end
-         *  
-         *  .ctor
-         *    load:img
-         *    load:var "myglobal"
-         *    rvm:output
-         *    ret
-         *  .end
-         */
+        var stopwatch = Stopwatch.StartNew();
         var person = new Obj
         {
             Ctor = new Function
@@ -67,6 +68,6 @@ class Test
         var image = Image.New("source", ref main);
 
         image.AddObj("person", person);
-        Robin.Execute(image);
+        image.Execute();
     }
 }
