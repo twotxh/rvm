@@ -2,7 +2,8 @@
 using RobinVM.Models;
 using System;
 using System.Diagnostics;
-
+using System.Runtime.InteropServices;
+using System.Collections.Generic;
 class Test
 {
     static void Main()
@@ -16,38 +17,56 @@ class Test
          *  .end
          *  
          *  .ctor
-         *    load
-         *    :img
+         *    load:img
          *    load:var "myglobal"
          *    rvm:output
          *    ret
          *  .end
          */
+        var person = new Obj
+        {
+            Ctor = new Function
+            {
+                Instructions = new Instruction[]
+                {
+                    Instruction.New(Runtime.LoadFromArgs, 0),
+                    Instruction.New(Runtime.LoadFromArgs, 1),
+                    Instruction.New(Runtime.StoreGlobal, "name"),
+                    Instruction.New(Runtime.Return)
+                }
+            },
+            CacheTable = new Dictionary<string, object>
+            {
+                { "about(.)", new Function
+                {
+                    Instructions = new Instruction[]
+                    {
+                        Instruction.New(Runtime.Load, "My name is: "),
+                        Instruction.New(Runtime.LoadFromArgs, 0),
+                        Instruction.New(Runtime.LoadGlobal, "name"),
+                        Instruction.New(Runtime.Add),
+                        Instruction.New(Runtime.RvmOutput),
+                        Instruction.New(Runtime.Return)
+                    }
+                }
+                },
+                { "name", null }
+            }
+
+        };
         var main = new Function
         {
             Instructions = new Instruction[]
             {
-                Instruction.New(Runtime.LoadRuntimeImage),
-                Instruction.New(Runtime.LoadGlobal, "myglobal1"),
-                Instruction.New(Runtime.LoadRuntimeImage),
-                Instruction.New(Runtime.LoadGlobal, "myglobal2"),
-                Instruction.New(Runtime.Call, "print(.)"),
-                Instruction.New(Runtime.Return)
-            }
-        };
-        var print = new Function
-        {
-            Instructions = new Instruction[]
-            {
-                Instruction.New(Runtime.LoadFromArgs, 1),
-                Instruction.New(Runtime.RvmOutput),
+                Instruction.New(Runtime.Load, "Carpal\n"),
+                Instruction.New(Runtime.NewObj, "person"),
+                Instruction.New(Runtime.CallInstance, "about(.)"),
                 Instruction.New(Runtime.Return)
             }
         };
         var image = Image.New("source", ref main);
-        image.AddFunction("print(.)", print);
-        image.AddGlobal("myglobal1", "global1");
-        image.AddGlobal("myglobal2", "global2");
+
+        image.AddObj("person", person);
         Robin.Execute(image);
     }
 }

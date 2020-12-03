@@ -32,6 +32,10 @@ namespace RobinVM.Models
         {
             return VirtualStack[^1];
         }
+        public T Peek<T>()
+        {
+            return (T)VirtualStack[^1];
+        }
         public void Push(object value)
         {
             VirtualStack.Add(value);

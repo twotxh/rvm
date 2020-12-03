@@ -52,6 +52,6 @@
     load:c 0
     load:c "baby"
     new:obj "person"
-    call "about(.)"
+    call:ins "about(.)"
     ret
 .end

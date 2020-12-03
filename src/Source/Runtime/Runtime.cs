@@ -45,6 +45,7 @@ namespace RobinVM
         /// </summary>
         /// <param name="args"></param>
         public static void CastToString(object args) => Stack.Push(Stack.Pop().ToString());
+        
         /// <summary>
         /// Stores the value onto the stack in the local heap
         /// </summary>
@@ -52,11 +53,34 @@ namespace RobinVM
         public static void Store(object args) => Storage[Convert.ToByte(args)] = Stack.Pop();
 
         /// <summary>
+        /// Pops the instance loaded onto the stack and store the global
+        /// </summary>
+        /// <param name="args">Name of global</param>
+        public static void StoreGlobal(object args) => Stack.Pop<CacheTable>()[(string)args] = Stack.Pop();
+
+        /// <summary>
         /// Calls a function
         /// </summary>
-        /// <param name="args">Index of function to call</param>
+        /// <param name="args">Name of function</param>
         public static void Call(object args) => RuntimeImage.FindFunction((string)args).ExecuteLabel();
 
+        /// <summary>
+        /// Pops the instance loaded onto the stack and calls the function
+        /// </summary>
+        /// <param name="args">Index of function to call</param>
+        public static void CallInstance(object args) => ((Function)Stack.Peek<CacheTable>()[(string)args]).ExecuteLabel();
+
+        /// <summary>
+        /// Loads onto the stack a new instance of the obj and call its ctor
+        /// </summary>
+        /// <param name="args">C# instance: new Obj {...}</param>
+        public static void NewObj(object args)
+        {
+            var ins = RuntimeImage.FindObj((string)args);
+            Stack.Push(ins.CacheTable);
+            ins.Ctor.ExecuteLabel();
+            Stack.Push(ins.CacheTable);
+        }
         /// <summary>
         /// Loads onto the stack a constant
         /// </summary>

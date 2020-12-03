@@ -5,7 +5,7 @@ namespace RobinVM.Models
 {
     public struct Obj
     {
-        readonly Dictionary<string, object> CacheTable;
+        public Dictionary<string, object> CacheTable;
         public Function Ctor;
     }
 }
