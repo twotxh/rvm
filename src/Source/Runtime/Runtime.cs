@@ -3,6 +3,7 @@ using System.Diagnostics;
 using System.Collections.Generic;
 using RobinVM.Models;
 
+using CacheTable = System.Collections.Generic.Dictionary<string, object>;
 namespace RobinVM
 {
     public static class Runtime
@@ -12,6 +13,7 @@ namespace RobinVM
         public static object[] Storage = new object[byte.MaxValue];
         public static int ProgramCounter = 0;
         public static Image RuntimeImage;
+        public static Function CurrentFunctionPointer;
         public static readonly RStack Stack = new RStack(16);
 
         /// <summary>
@@ -53,7 +55,7 @@ namespace RobinVM
         /// Calls a function
         /// </summary>
         /// <param name="args">Index of function to call</param>
-        public static void Call(object args) => Robin.ExecuteLabel(RuntimeImage.FindFunction((string)args));
+        public static void Call(object args) => RuntimeImage.FindFunction((string)args).ExecuteLabel();
 
         /// <summary>
         /// Loads onto the stack a constant
@@ -64,13 +66,19 @@ namespace RobinVM
         /// <summary>
         /// Loads onto the stack a global variable
         /// </summary>
-        /// <param name="args">global variable id</param>
-        public static void LoadGlobal(object args) => Stack.Push(((Dictionary<string, object>)Stack.Pop())[(string)args]);
+        /// <param name="args">Global variable id</param>
+        public static void LoadGlobal(object args) => Stack.Push(((CacheTable)Stack.Pop())[(string)args]);
+
+        /// <summary>
+        /// Loads onto the stack a constant
+        /// </summary>
+        /// <param name="args">Constant to load onto the stack</param>
+        public static void LoadFromArgs(object args) => Stack.Push(CurrentFunctionPointer.Arguments[Convert.ToByte(args)]);
 
         /// <summary>
         /// Loads onto the stack a global variable
         /// </summary>
-        /// <param name="args">global variable id</param>
+        /// <param name="args">G-lobal variable id</param>
         public static void LoadRuntimeImage(object args) => Stack.Push(RuntimeImage.GetCacheTable());
 
         /// <summary>

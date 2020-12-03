@@ -11,11 +11,12 @@
     load:var "myglobal"
     load:c 23
     load:c 2
-    new:list i32 2          ; instantiate a new list of type i32 of size 2 
+    load:c 2                ; size
+    new:list                ; instantiate a new list of size 2 
     call "add(.)"
     call "getstr(.)"
     call "cnctstr(..)"
-    call "print(.)"  ; output: Result of [23, 2]: 25
+    call "print(.)"         ; output: Result of [23, 2]: 25
     ret
 .end
 

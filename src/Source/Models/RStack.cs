@@ -10,11 +10,23 @@ namespace RobinVM.Models
             VirtualStack = new List<object>(maxStack);
         }
         List<object> VirtualStack;
+        public void TransferToArguments(ref Function function)
+        {
+            function.Arguments = new object[VirtualStack.Count];
+            while (VirtualStack.Count > 0)
+                function.Arguments[VirtualStack.Count-1] = Pop();
+        }
         public object Pop()
         {
             var x0 = VirtualStack[^1];
             VirtualStack.RemoveAt(VirtualStack.Count - 1);
             return x0;
+        }
+        public T Pop<T>()
+        {
+            var x0 = VirtualStack[^1];
+            VirtualStack.RemoveAt(VirtualStack.Count - 1);
+            return (T)x0;
         }
         public object Peek()
         {

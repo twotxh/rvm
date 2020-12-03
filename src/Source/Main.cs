@@ -16,7 +16,8 @@ class Test
          *  .end
          *  
          *  .ctor
-         *    load:img
+         *    load
+         *    :img
          *    load:var "myglobal"
          *    rvm:output
          *    ret
@@ -27,13 +28,26 @@ class Test
             Instructions = new Instruction[]
             {
                 Instruction.New(Runtime.LoadRuntimeImage),
-                Instruction.New(Runtime.LoadGlobal, "myglobal"),
+                Instruction.New(Runtime.LoadGlobal, "myglobal1"),
+                Instruction.New(Runtime.LoadRuntimeImage),
+                Instruction.New(Runtime.LoadGlobal, "myglobal2"),
+                Instruction.New(Runtime.Call, "print(.)"),
+                Instruction.New(Runtime.Return)
+            }
+        };
+        var print = new Function
+        {
+            Instructions = new Instruction[]
+            {
+                Instruction.New(Runtime.LoadFromArgs, 1),
                 Instruction.New(Runtime.RvmOutput),
                 Instruction.New(Runtime.Return)
             }
         };
         var image = Image.New("source", ref main);
-        image.AddGlobal("myglobal", 10);
+        image.AddFunction("print(.)", print);
+        image.AddGlobal("myglobal1", "global1");
+        image.AddGlobal("myglobal2", "global2");
         Robin.Execute(image);
     }
 }

@@ -6,7 +6,9 @@
         public Function(Instruction[] instructions)
         {
             Instructions = instructions;
+            Arguments = null;
         }
+        public object[] Arguments;
         public Instruction[] Instructions;
     }
 }

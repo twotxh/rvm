@@ -22,20 +22,24 @@ namespace RobinVM
         /// </code>
         /// </summary>
         /// <param name="program">Functions</param>
-        public static void Execute(Models.Image programImage)
+        public static void Execute(this Models.Image programImage)
         {
             Runtime.Stack.Clear();
             Runtime.Storage = new object[byte.MaxValue];
             Runtime.RuntimeImage = programImage;
-            ExecuteLabel(programImage.EntryPointPointer);
+            programImage.EntryPointPointer.ExecuteLabel();
         }
-        public static void ExecuteLabel(Models.Function label)
+        public static void ExecuteLabel(this Models.Function function)
         {
             var x0 = Runtime.Storage;
             var x1 = Runtime.ProgramCounter;
             Runtime.Storage = new object[byte.MaxValue];
-            for (Runtime.ProgramCounter = 0; Runtime.ProgramCounter < label.Instructions.Length; Runtime.ProgramCounter++)
-                label.Instructions[Runtime.ProgramCounter].FunctionPointer(label.Instructions[Runtime.ProgramCounter].Argument);
+            Runtime.Stack.TransferToArguments(ref function);
+            Runtime.CurrentFunctionPointer = function;
+
+            for (Runtime.ProgramCounter = 0; Runtime.ProgramCounter < function.Instructions.Length; Runtime.ProgramCounter++)
+                function.Instructions[Runtime.ProgramCounter].FunctionPointer(function.Instructions[Runtime.ProgramCounter].Argument);
+
             Runtime.Storage = x0;
             Runtime.ProgramCounter = x1;
         }
