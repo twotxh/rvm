@@ -1,8 +1,6 @@
+using RobinVM.Models;
 using System;
 using System.Diagnostics;
-using System.Collections.Generic;
-using RobinVM.Models;
-
 using CacheTable = System.Collections.Generic.Dictionary<string, object>;
 namespace RobinVM
 {
@@ -15,6 +13,12 @@ namespace RobinVM
         public static Image RuntimeImage;
         public static Function CurrentFunctionPointer;
         public static readonly RStack Stack = new RStack(16);
+
+        /// <summary>
+        /// Matches if stack peek type is the same of T
+        /// </summary>
+        /// <param name="args"></param>
+        public static void CastToInt<T>(object args) => Stack.Push(Stack.Peek() is T);
 
         /// <summary>
         /// Casts last element onto the stack to int32 and push result
@@ -45,7 +49,7 @@ namespace RobinVM
         /// </summary>
         /// <param name="args"></param>
         public static void CastToString(object args) => Stack.Push(Stack.Pop().ToString());
-        
+
         /// <summary>
         /// Stores the value onto the stack in the local heap
         /// </summary>
@@ -62,23 +66,27 @@ namespace RobinVM
         /// Calls a function
         /// </summary>
         /// <param name="args">Name of function</param>
-        public static void Call(object args) => RuntimeImage.FindFunction((string)args).ExecuteLabel();
+        public static void Call(object args) => RuntimeImage.FindFunction((string)args).ExecuteLabel((string)args);
 
         /// <summary>
         /// Pops the instance loaded onto the stack and calls the function
         /// </summary>
         /// <param name="args">Index of function to call</param>
-        public static void CallInstance(object args) => ((Function)Stack.Peek<CacheTable>()[(string)args]).ExecuteLabel();
+        public static void CallInstance(object args)
+        {
+            var p = Stack.Peek<CacheTable>();
+            ((Function)p[(string)args]).ExecuteLabel(p["$"]+":" + (string)args);
+        }
 
         /// <summary>
         /// Loads onto the stack a new instance of the obj and call its ctor
         /// </summary>
-        /// <param name="args">C# instance: new Obj {...}</param>
+        /// <param name="args">Name of obj</param>
         public static void NewObj(object args)
         {
             var ins = RuntimeImage.FindObj((string)args);
             Stack.Push(ins.CacheTable);
-            ins.Ctor.ExecuteLabel();
+            ins.Ctor.Value.ExecuteLabel((string)args+":ctor");
             Stack.Push(ins.CacheTable);
         }
         /// <summary>
@@ -147,7 +155,7 @@ namespace RobinVM
             object p = Stack.Pop();
             object p1 = Stack.Pop();
             if (p.GetType() != p1.GetType())
-                throw new NotSupportedException("Cannot perform operation `Add` between types `" + p1.GetType() + "` & `"+p.GetType()+"`");
+                throw new NotSupportedException("Cannot perform operation `Add` between types `" + p1.GetType() + "` & `" + p.GetType() + "`");
             if (p is string) Stack.Push((string)p1 + (string)p);
             else if (p is byte) Stack.Push((byte)p1 + (byte)p);
             else if (p is short) Stack.Push((short)p1 + (short)p);
@@ -244,6 +252,18 @@ namespace RobinVM
         public static void RvmCall(object args) => ((CallPointer)Stack.Pop())();
 
         /// <summary>
+        /// Exits from the program and returns stack pop as code
+        /// </summary>
+        /// <param name="args"></param>
+        public static void RvmExit(object args) => Environment.Exit((int)Stack.Pop());
+
+        /// <summary>
+        /// Throws a new exception with a string parameter as message
+        /// </summary>
+        /// <param name="args"></param>
+        public static void RvmThrow(object args) => BasePanic.Throw((string)Stack.Pop(), "Runtime");
+
+        /// <summary>
         /// Pops the last element of the stack
         /// </summary>
         /// <param name="args"></param>
@@ -259,7 +279,7 @@ namespace RobinVM
         /// Breaks function executing returning to previous
         /// </summary>
         /// <param name="args"></param>
-        public static void Return(object args) => ProgramCounter = int.MaxValue-1;
+        public static void Return(object args) => ProgramCounter = int.MaxValue - 1;
 
         /// <summary>
         /// Compares last two elements onto the stack and pushes true if are equals or false
@@ -314,12 +334,6 @@ namespace RobinVM
         public static void CompareNEQ(object args) => Stack.Push(!Stack.Pop().Equals(Stack.Pop()));
 
         /// <summary>
-        /// Exits from the program
-        /// </summary>
-        /// <param name="args">ExitCode</param>
-        public static void Exit(object args) => Environment.Exit((int)args);
-
-        /// <summary>
         /// Pops last element of the stack and jump to <paramref name="args"/> if true
         /// </summary>
         /// <param name="args">Index of instruction to jump on</param>
@@ -337,6 +351,26 @@ namespace RobinVM
         {
             if (!(bool)Stack.Pop())
                 ProgramCounter = (int)args - 1;
+        }
+
+        /// <summary>
+        /// Pops last element of the stack and jump to <paramref name="args"/> if true
+        /// </summary>
+        /// <param name="args">Name of the label to jump on</param>
+        public static void JumpTrueLabel(object args)
+        {
+            if ((bool)Stack.Pop())
+                ProgramCounter = CurrentFunctionPointer.FindLabel((string)args) - 1;
+        }
+
+        /// <summary>
+        /// Pops last element of the stack and jump to <paramref name="args"/> if false
+        /// </summary>
+        /// <param name="args">Name of the label to jump on</param>
+        public static void JumpFalseLabel(object args)
+        {
+            if (!(bool)Stack.Pop())
+                ProgramCounter = CurrentFunctionPointer.FindLabel((string)args) - 1;
         }
 
         /// <summary>
@@ -382,7 +416,13 @@ namespace RobinVM
         /// <summary>
         /// Jumps to <paramref name="args"/>
         /// </summary>
-        /// <param name="args">Number of instruction to jump on</param>
+        /// <param name="args">Index of instruction to jump on</param>
         public static void Jump(object args) => ProgramCounter = (int)args - 1;
+
+        /// <summary>
+        /// Jumps to <paramref name="args"/>
+        /// </summary>
+        /// <param name="args">Name of the label to jump on</param>
+        public static void JumpLabel(object args) => ProgramCounter = CurrentFunctionPointer.FindLabel((string)args) - 1;
     }
 }

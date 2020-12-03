@@ -1,73 +1,48 @@
 ﻿using RobinVM;
 using RobinVM.Models;
 using System;
-using System.Diagnostics;
-using System.Runtime.InteropServices;
 using System.Collections.Generic;
-
-class Person
-{
-    public string Name = null;
-    public Person(string name)
-    {
-        this.Name = name;
-    }
-    public void About()
-    {
-        Console.WriteLine("My name is: "+this.Name);
-    }
-}
-
+using System.Diagnostics;
 
 class Test
 {
     static void Main()
     {
-        var stopwatch = Stopwatch.StartNew();
-        var person = new Obj
+        var str = new Obj
         {
-            Ctor = new Function
+            Ctor = new Function(null)
             {
                 Instructions = new Instruction[]
                 {
-                    Instruction.New(Runtime.LoadFromArgs, 0),
-                    Instruction.New(Runtime.LoadFromArgs, 1),
-                    Instruction.New(Runtime.StoreGlobal, "name"),
                     Instruction.New(Runtime.Return)
                 }
             },
-            CacheTable = new Dictionary<string, object>
+            CacheTable = new Dictionary<string, object>()
             {
-                { "about(.)", new Function
+                { "insfun(.)", new Function(null)
                 {
                     Instructions = new Instruction[]
                     {
-                        Instruction.New(Runtime.Load, "My name is: "),
-                        Instruction.New(Runtime.LoadFromArgs, 0),
-                        Instruction.New(Runtime.LoadGlobal, "name"),
-                        Instruction.New(Runtime.Add),
-                        Instruction.New(Runtime.RvmOutput),
+                        Instruction.New(Runtime.Load, "Unerror"),
+                        Instruction.New(Runtime.RvmThrow),
                         Instruction.New(Runtime.Return)
                     }
                 }
                 },
-                { "name", null }
+                { "$", "str" }
             }
-
         };
-        var main = new Function
+
+        var main = new Function(null)
         {
             Instructions = new Instruction[]
             {
-                Instruction.New(Runtime.Load, "Carpal\n"),
-                Instruction.New(Runtime.NewObj, "person"),
-                Instruction.New(Runtime.CallInstance, "about(.)"),
                 Instruction.New(Runtime.Return)
             }
         };
-        var image = Image.New("source", ref main);
 
-        image.AddObj("person", person);
+        var image = Image.New("main", ref main);
+
         image.Execute();
     }
 }

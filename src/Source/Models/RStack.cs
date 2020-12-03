@@ -14,7 +14,7 @@ namespace RobinVM.Models
         {
             function.Arguments = new object[VirtualStack.Count];
             while (VirtualStack.Count > 0)
-                function.Arguments[VirtualStack.Count-1] = Pop();
+                function.Arguments[VirtualStack.Count - 1] = Pop();
         }
         public object Pop()
         {
@@ -53,7 +53,7 @@ namespace RobinVM.Models
             Console.WriteLine("Stack Count: {0}/{1}\nStack Draw:", VirtualStack.Count, VirtualStack.Capacity);
             if (VirtualStack.Count == 0)
                 Console.WriteLine("   Empty Stack");
-            for (int i = VirtualStack.Count-1; i >= 0; i--)
+            for (int i = VirtualStack.Count - 1; i >= 0; i--)
                 Console.WriteLine("   {0} | Object[{2}]: `{1}`", i, VirtualStack[i], VirtualStack[i].GetType().ToString());
         }
     }
