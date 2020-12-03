@@ -54,8 +54,7 @@ namespace RobinVM.Models
         {
             if (@object.CacheTable == null)
                 BasePanic.Throw($"Obj `{id}` does not contain members", "PreRuntime");
-            if (!@object.CacheTable.ContainsKey("$"))
-                BasePanic.Throw($"Obj `{id}` does not contain a definition for symbol `$`, used to recover the obj name at runtime", "PreRuntime");
+            @object.CacheTable.TryAdd("$", id);
             if (@object.Ctor == null)
                 BasePanic.Throw($"Obj `{id}` does not contain a definition for ctor function", "PreRuntime");
             if (!this.CacheTable.TryAdd(id, @object))

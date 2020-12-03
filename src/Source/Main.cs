@@ -29,7 +29,6 @@ class Test
                     }
                 }
                 },
-                { "$", "str" }
             }
         };
 
@@ -37,11 +36,14 @@ class Test
         {
             Instructions = new Instruction[]
             {
+                Instruction.New(Runtime.NewObj, "str"),
+                Instruction.New(Runtime.CallInstance, "insfun(.)"),
                 Instruction.New(Runtime.Return)
             }
         };
 
         var image = Image.New("main", ref main);
+        image.AddObj("str", str);
 
         image.Execute();
     }
