@@ -1,4 +1,5 @@
 ﻿using RobinVM.Models;
+using System;
 
 namespace RobinVM
 {
@@ -28,18 +29,30 @@ namespace RobinVM
         }
         public static void ExecuteLabel(this Function function, string trail)
         {
-            var x0 = Runtime.Storage;
             var x1 = Runtime.ProgramCounter;
-            Runtime.Storage = new object[byte.MaxValue];
+            BasePanic.LoadTrail(trail);
             Runtime.Stack.TransferToArguments(ref function);
             Runtime.CurrentFunctionPointer = function;
-            BasePanic.LoadTrail(trail);
+            if (Runtime.StorageManager != 0)
+            {
+                var x0 = Runtime.Storage;
+                Runtime.Storage = new object[byte.MaxValue];
 
-            for (Runtime.ProgramCounter = 0; Runtime.ProgramCounter < function.Instructions.Length; Runtime.ProgramCounter++)
-                function.Instructions[Runtime.ProgramCounter].FunctionPointer(function.Instructions[Runtime.ProgramCounter].Argument);
+                for (Runtime.ProgramCounter = 0, Runtime.StorageManager = 0; Runtime.ProgramCounter < function.Instructions.Length; Runtime.ProgramCounter++)
+                    function.Instructions[Runtime.ProgramCounter].FunctionPointer(function.Instructions[Runtime.ProgramCounter].Argument);
 
+                if (Runtime.StorageManager != 0)
+                    Runtime.Storage = x0;
+            }
+            else
+            {
+                for (Runtime.ProgramCounter = 0, Runtime.StorageManager = 0; Runtime.ProgramCounter < function.Instructions.Length; Runtime.ProgramCounter++)
+                    function.Instructions[Runtime.ProgramCounter].FunctionPointer(function.Instructions[Runtime.ProgramCounter].Argument);
+
+                if (Runtime.StorageManager != 0)
+                    Array.Clear(Runtime.Storage, byte.MinValue, byte.MaxValue);
+            }
             BasePanic.UnloadTrail();
-            Runtime.Storage = x0;
             Runtime.ProgramCounter = x1;
         }
     }

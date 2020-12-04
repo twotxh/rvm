@@ -23,8 +23,6 @@ class Test
                 {
                     Instructions = new Instruction[]
                     {
-                        Instruction.New(Runtime.Load, "Unerror"),
-                        Instruction.New(Runtime.RvmThrow),
                         Instruction.New(Runtime.Return)
                     }
                 }
@@ -36,15 +34,26 @@ class Test
         {
             Instructions = new Instruction[]
             {
-                Instruction.New(Runtime.NewObj, "str"),
-                Instruction.New(Runtime.CallInstance, "insfun(.)"),
+                Instruction.New(Runtime.Call, "f1()"),
+                Instruction.New(Runtime.Return)
+            }
+        };
+
+        var f1 = new Function(null)
+        {
+            Instructions = new Instruction[]
+            {
                 Instruction.New(Runtime.Return)
             }
         };
 
         var image = Image.New("main", ref main);
-        image.AddObj("str", str);
+        image.AddFunction("f1()", f1);
+        //image.AddObj("str", str);
 
+        //var stopwatch = Stopwatch.StartNew();
         image.Execute();
+        //stopwatch.Stop();
+        //Console.WriteLine("ms: {0}", stopwatch.ElapsedMilliseconds);
     }
 }

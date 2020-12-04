@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Diagnostics.CodeAnalysis;
 
 namespace RobinVM.Models
@@ -29,8 +30,23 @@ namespace RobinVM.Models
         {
             return Labels == null;
         }
+        public object FindArgument(byte index)
+        {
+            if (Arguments is null)
+                BasePanic.Throw($"Insufficient function arguments, have not been passed {index} argument/s", "Runtime");
+            if (index < 0)
+                BasePanic.Throw("Can not index function argument with a negative index", "Runtime");
+            if (index < Arguments.Length)
+                return Arguments[index];
+            BasePanic.Throw($"Insufficient function arguments, have not been passed {index} argument/s", "Runtime");
+            return null;
+        }
+        public void PassArguments(object[] arguments)
+        {
+            Arguments = arguments;
+        }
         Dictionary<string, int> Labels;
-        public object[] Arguments;
+        object[] Arguments;
         public Instruction[] Instructions;
     }
 }

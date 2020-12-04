@@ -9,6 +9,7 @@ namespace RobinVM
         public delegate void RuntimePointer(object args);
         public delegate void CallPointer();
         public static object[] Storage = new object[byte.MaxValue];
+        public static byte StorageManager = 0;
         public static int ProgramCounter = 0;
         public static Image RuntimeImage;
         public static Function CurrentFunctionPointer;
@@ -53,8 +54,22 @@ namespace RobinVM
         /// <summary>
         /// Stores the value onto the stack in the local heap
         /// </summary>
-        /// <param name="args">Index of the local heap into store last stack element</param>
-        public static void Store(object args) => Storage[Convert.ToByte(args)] = Stack.Pop();
+        /// <param name="args">Index of the slot into store last stack element</param>
+        public static void Store(object args)
+        {
+            Storage[Convert.ToByte(args)] = Stack.Pop();
+            StorageManager++;
+        }
+
+        /// <summary>
+        /// Frees a local heap slot
+        /// </summary>
+        /// <param name="args">Index of the slot to free</param>
+        public static void Restore(object args)
+        {
+            Storage[Convert.ToByte(args)] = null;
+            StorageManager--;
+        }
 
         /// <summary>
         /// Pops the instance loaded onto the stack and store the global
@@ -75,7 +90,7 @@ namespace RobinVM
         public static void CallInstance(object args)
         {
             var p = Stack.Peek<CacheTable>();
-            ((Function)p[(string)args]).ExecuteLabel(p["$"]+":" + (string)args);
+            ((Function)p[(string)args]).ExecuteLabel("ins "+p["$"]+":" + (string)args);
         }
 
         /// <summary>
@@ -86,7 +101,7 @@ namespace RobinVM
         {
             var ins = RuntimeImage.FindObj((string)args);
             Stack.Push(ins.CacheTable);
-            ins.Ctor.Value.ExecuteLabel((string)args+":ctor");
+            ins.Ctor.Value.ExecuteLabel("ins "+(string)args+":ctor");
             Stack.Push(ins.CacheTable);
         }
         /// <summary>
@@ -105,7 +120,7 @@ namespace RobinVM
         /// Loads onto the stack a constant
         /// </summary>
         /// <param name="args">Constant to load onto the stack</param>
-        public static void LoadFromArgs(object args) => Stack.Push(CurrentFunctionPointer.Arguments[Convert.ToByte(args)]);
+        public static void LoadFromArgs(object args) => Stack.Push(CurrentFunctionPointer.FindArgument(Convert.ToByte(args)));
 
         /// <summary>
         /// Loads onto the stack a global variable
