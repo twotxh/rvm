@@ -33,12 +33,12 @@ namespace RobinVM.Models
         public object FindArgument(byte index)
         {
             if (Arguments is null)
-                BasePanic.Throw($"Insufficient function arguments, have not been passed {index} argument/s", "Runtime");
+                BasePanic.Throw($"Insufficient function arguments, have not been passed {index+1} argument/s", "Runtime");
             if (index < 0)
                 BasePanic.Throw("Can not index function argument with a negative index", "Runtime");
             if (index < Arguments.Length)
                 return Arguments[index];
-            BasePanic.Throw($"Insufficient function arguments, have not been passed {index} argument/s", "Runtime");
+            BasePanic.Throw($"Insufficient function arguments, have not been passed {index+1} argument/s", "Runtime");
             return null;
         }
         public void PassArguments(object[] arguments)

@@ -8,25 +8,33 @@ class Test
 {
     static void Main()
     {
-        var str = new Obj
+        var person = new Obj
         {
             Ctor = new Function(null)
             {
                 Instructions = new Instruction[]
                 {
+                    Instruction.New(Runtime.LoadFromArgs, 0),
+                    Instruction.New(Runtime.LoadFromArgs, 1),
+                    Instruction.New(Runtime.LoadFromArgs, 2),
+                    Instruction.New(Runtime.StoreGlobal, "name"),
                     Instruction.New(Runtime.Return)
                 }
             },
             CacheTable = new Dictionary<string, object>()
             {
-                { "insfun(.)", new Function(null)
+                { "printname(.)", new Function(null)
                 {
                     Instructions = new Instruction[]
                     {
+                        Instruction.New(Runtime.LoadFromArgs, 0),
+                        Instruction.New(Runtime.LoadGlobal, "name"),
+                        Instruction.New(Runtime.RvmOutput),
                         Instruction.New(Runtime.Return)
                     }
                 }
                 },
+                { "name", null }
             }
         };
 
@@ -34,22 +42,16 @@ class Test
         {
             Instructions = new Instruction[]
             {
-                Instruction.New(Runtime.Call, "f1()"),
-                Instruction.New(Runtime.Return)
-            }
-        };
-
-        var f1 = new Function(null)
-        {
-            Instructions = new Instruction[]
-            {
+                Instruction.New(Runtime.Load, "Carpal"),
+                Instruction.New(Runtime.Load, "!"),
+                Instruction.New(Runtime.NewObj, "person"),
+                Instruction.New(Runtime.CallInstance, "printname(.)"),
                 Instruction.New(Runtime.Return)
             }
         };
 
         var image = Image.New("main", ref main);
-        image.AddFunction("f1()", f1);
-        //image.AddObj("str", str);
+        image.AddObj("person", person);
 
         //var stopwatch = Stopwatch.StartNew();
         image.Execute();

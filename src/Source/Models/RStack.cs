@@ -18,7 +18,10 @@ namespace RobinVM.Models
         public void TransferToArguments(ref Function function)
         {
             if (VirtualStack.Count != 0)
+            {
                 function.PassArguments(VirtualStack.ToArray());
+                VirtualStack.Clear();
+            }
         }
         public object Pop()
         {
@@ -50,8 +53,14 @@ namespace RobinVM.Models
         }
         public void Push(object value)
         {
-            if (VirtualStack.Count == 15)
+            if (VirtualStack.Count == 16)
                 BasePanic.Throw("Tryed to push element onto full stack, use Runtime.Stack.DrawStack function at runtime to debug the stack container", "Runtime");
+            VirtualStack.Add(value);
+        }
+        public void PrePush(object value)
+        {
+            if (VirtualStack.Count == 16)
+                BasePanic.Throw("Tryed to put element at the base of full stack, use Runtime.Stack.DrawStack function at runtime to debug the stack container", "Runtime");
             VirtualStack.Add(value);
         }
         public void PopNR()
