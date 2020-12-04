@@ -35,14 +35,15 @@ namespace RobinVM
             Runtime.CurrentFunctionPointer = function;
             if (Runtime.StorageManager != 0)
             {
+                var x2 = Runtime.StorageManager;
                 var x0 = Runtime.Storage;
                 Runtime.Storage = new object[byte.MaxValue];
 
                 for (Runtime.ProgramCounter = 0, Runtime.StorageManager = 0; Runtime.ProgramCounter < function.Instructions.Length; Runtime.ProgramCounter++)
                     function.Instructions[Runtime.ProgramCounter].FunctionPointer(function.Instructions[Runtime.ProgramCounter].Argument);
 
-                if (Runtime.StorageManager != 0)
-                    Runtime.Storage = x0;
+                Runtime.Storage = x0;
+                Runtime.StorageManager = x2;
             }
             else
             {

@@ -16,7 +16,6 @@ class Test
                 {
                     Instruction.New(Runtime.LoadFromArgs, 0),
                     Instruction.New(Runtime.LoadFromArgs, 1),
-                    Instruction.New(Runtime.LoadFromArgs, 2),
                     Instruction.New(Runtime.StoreGlobal, "name"),
                     Instruction.New(Runtime.Return)
                 }
@@ -42,9 +41,13 @@ class Test
         {
             Instructions = new Instruction[]
             {
-                Instruction.New(Runtime.Load, "Carpal"),
-                Instruction.New(Runtime.Load, "!"),
+                Instruction.New(Runtime.Load, "first"),
                 Instruction.New(Runtime.NewObj, "person"),
+                Instruction.New(Runtime.Store, 0),
+                Instruction.New(Runtime.Load, "second"),
+                Instruction.New(Runtime.NewObj, "person"),
+                Instruction.New(Runtime.CallInstance, "printname(.)"),
+                Instruction.New(Runtime.LoadFromStorage, 0),
                 Instruction.New(Runtime.CallInstance, "printname(.)"),
                 Instruction.New(Runtime.Return)
             }

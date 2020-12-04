@@ -99,7 +99,7 @@ namespace RobinVM
         /// <param name="args">Name of obj</param>
         public static void NewObj(object args)
         {
-            var ins = RuntimeImage.FindObj((string)args);
+            var ins = RuntimeImage.FindObj((string)args).Copy();
             Stack.PrePush(ins.CacheTable);
             ins.Ctor.Value.ExecuteLabel("ins "+(string)args+":ctor");
             Stack.Push(ins.CacheTable);
