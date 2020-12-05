@@ -93,7 +93,7 @@ namespace RobinVM
         /// <param name="args">Index of function to call</param>
         public static void CallInstance(object args)
         {
-            var p = Stack.Peek<CacheTable>();
+            var p = Stack.PrePeek<CacheTable>();
             ((Function)p[(string)args]).ExecuteLabel("ins "+p["$"]+":" + (string)args);
         }
 

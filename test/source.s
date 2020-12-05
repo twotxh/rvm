@@ -11,8 +11,7 @@
     load:var "myglobal"
     load:c 23
     load:c 2
-    load:c 2                ; size
-    new:list                ; instantiate a new list of size 2 
+    new:list                ; instantiate a new list
     call "add(.)"
     call "getstr(.)"
     call "cnctstr(..)"

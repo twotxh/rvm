@@ -39,17 +39,25 @@ namespace RobinVM.Models
             VirtualStack.RemoveAt(VirtualStack.Count - 1);
             return (T)x0;
         }
+        public T PrePop<T>()
+        {
+            if (VirtualStack.Count == 0)
+                BasePanic.Throw("Tryed to pop element from empty stack, use Runtime.Stack.DrawStack function at runtime to debug the stack container", 12, "Runtime");
+            var x0 = VirtualStack[0];
+            VirtualStack.RemoveAt(0);
+            return (T)x0;
+        }
         public object Peek()
         {
             if (VirtualStack.Count == 0)
                 BasePanic.Throw("Tryed to peek the value of element on empty stack, use Runtime.Stack.DrawStack function at runtime to debug the stack container", 17, "Runtime");
             return VirtualStack[^1];
         }
-        public T Peek<T>()
+        public T PrePeek<T>()
         {
             if (VirtualStack.Count == 0)
-                BasePanic.Throw("Tryed to peek the value of element on empty stack, use Runtime.Stack.DrawStack function at runtime to debug the stack container", 11, "Runtime");
-            return (T)VirtualStack[^1];
+                BasePanic.Throw("Tryed to peek the value at the base of empty stack, use Runtime.Stack.DrawStack function at runtime to debug the stack container", 11, "Runtime");
+            return (T)VirtualStack[0];
         }
         public void Push(object value)
         {

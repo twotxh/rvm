@@ -8,6 +8,8 @@ class Test
 {
     static void Main()
     {
+        #region ERROR HANDLING TEST
+        /*
         var person = new Obj
         {
             Ctor = new Function(null)
@@ -94,10 +96,22 @@ class Test
                 Instruction.New(Runtime.Return)
             }
         };
-
+        */
+        #endregion
+        var main = Function.New(
+            new Instruction[]
+            {
+                Instruction.New(Runtime.Load, 23),
+                Instruction.New(Runtime.Load, 2),
+                Instruction.New(Runtime.Load, "fdf"),
+                Instruction.New(Runtime.Load, 1),
+                Instruction.New(Runtime.NewObj, "list"),
+                Instruction.New(Runtime.Load, 0),
+                Instruction.New(Runtime.CallInstance, "find(..)"),
+                Instruction.New(Runtime.RvmOutput),
+                Instruction.New(Runtime.Return)
+            });
         var image = Image.New("main", ref main);
-        image.AddFunction("test2()", test2);
-        image.AddFunction("test3()", test3);
 
         image.Execute();
     }

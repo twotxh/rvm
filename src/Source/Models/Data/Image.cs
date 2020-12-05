@@ -4,52 +4,11 @@ using System.Runtime.InteropServices;
 
 namespace RobinVM.Models
 {
-    public struct Image
+    public partial struct Image
     {
         public static Image New(string manifestName, ref Function entryPoint)
         {
             return new Image(manifestName, ref entryPoint);
-        }
-
-        public void InitializeBuiltIn()
-        {
-            CacheTable.Add("basepanic",
-                new Obj
-                {
-                    Ctor = new Function()
-                    {
-                        Instructions = new Instruction[]
-                        {
-                            Instruction.New(Runtime.LoadFromArgs, 0),
-                            Instruction.New(Runtime.LoadFromArgs, 1),
-                            Instruction.New(Runtime.StoreGlobal, "msg"),
-                            Instruction.New(Runtime.LoadFromArgs, 0),
-                            Instruction.New(Runtime.LoadFromArgs, 2),
-                            Instruction.New(Runtime.StoreGlobal, "code"),
-                            Instruction.New(Runtime.LoadFromArgs, 0),
-                            Instruction.New(Runtime.LoadFromArgs, 3),
-                            Instruction.New(Runtime.StoreGlobal, "type"),
-                            Instruction.New(Runtime.Return)
-                        }
-                    },
-                    CacheTable = new Dictionary<string, object>()
-                    {
-                        { "msg", null },
-                        { "code", null },
-                        { "type", "BasePanic" },
-                        { "throw(.)",
-                            new Function
-                            {
-                                Instructions = new Instruction[]
-                                {
-                                    Instruction.New(Runtime.LoadFromArgs, 0),
-                                    Instruction.New(Runtime.RvmThrow),
-                                    Instruction.New(Runtime.Return),
-                                }
-                            }
-                        }
-                    }
-                });
         }
 
         readonly public string ManifestName;

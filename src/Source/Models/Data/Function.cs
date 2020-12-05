@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Diagnostics.CodeAnalysis;
+using System.Linq;
 
 namespace RobinVM.Models
 {
@@ -44,6 +45,10 @@ namespace RobinVM.Models
         public void PassArguments(object[] arguments)
         {
             Arguments = arguments;
+        }
+        public void LoadArgumentsAsList()
+        {
+            Runtime.Stack.Push(Arguments[1..^1].ToList());
         }
         Dictionary<string, int> Labels;
         object[] Arguments;
