@@ -1,8 +1,0 @@
-rvm.csproj.user
-rvm.sln
-.vscode/
-.vs/
-bin/
-src_cpp/cmake-build-debug/
-src_cpp/.idea/
-src_cpp/.vscode/

@@ -98,7 +98,8 @@ class Test
         };
         */
         #endregion
-        var main = Function.New(
+        var main = Function.New
+        (
             new Instruction[]
             {
                 Instruction.New(Runtime.Load, 23),
@@ -110,7 +111,8 @@ class Test
                 Instruction.New(Runtime.CallInstance, "find(..)"),
                 Instruction.New(Runtime.RvmOutput),
                 Instruction.New(Runtime.Return)
-            });
+            }
+        );
         var image = Image.New("main", ref main);
 
         image.Execute();

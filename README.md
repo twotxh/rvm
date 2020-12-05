@@ -1,6 +1,14 @@
+<img width="200" height="200" src="extra/robin.png" align="right" />
+
 # RobinVM
-___________
-###### ♥️ RVM is a bytecode virtual machine -> provides you tools to make and perform bytecode instructions!<br>
-###### ♥️ RVM is a pointer based vm -> it uses c# delegates to performs instructions!<br>
-###### ♥️ RVM is a experimental and simple project -> it doesn't use switch statement, increasing instructions performing!<br>
-___________
+> Robin Virtual Machine
+
+<hr/>
+<h3> ♥️ RVM is a bytecode virtual machine</h3>
+<h3> ♥️ RVM is a pointer based vm</h3>
+<h3> ♥️ RVM is a experimental and simple project</h3>
+<h3> ♥️ RVM is a object oriented vm</h3>
+<h3> ♥️ RVM is a untyped system</h3>
+<h3> ♥️ RVM is a modern vm: it supports objects, classes, functions, for iter cycle, exception handling</h3>
+<h3> ♥️ RVM is a exensible vm, it can be customized and extended by the user</h3>
+<hr/>
