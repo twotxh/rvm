@@ -17,13 +17,13 @@ namespace RobinVM.Models
         public void AddLabel(string label, int instructionIndex)
         {
             if (!Labels.TryAdd(label, instructionIndex))
-                BasePanic.Throw($"Already define label `{label}` as {Labels[label]}: `{Instructions[Labels[label]].FunctionPointer.Method.Name}`", "PreRuntime");
+                BasePanic.Throw($"Already define label `{label}` as {Labels[label]}: `{Instructions[Labels[label]].FunctionPointer.Method.Name}`", 2, "PreRuntime");
         }
         public int FindLabel(string label)
         {
             if (Labels.TryGetValue(label, out int ret))
                 return ret;
-            BasePanic.Throw($"Undefine label `{label}`", "Runtime");
+            BasePanic.Throw($"Undefine label `{label}`", 3, "Runtime");
             return 0;
         }
         public bool UninstantiatedLabels()
@@ -33,12 +33,12 @@ namespace RobinVM.Models
         public object FindArgument(byte index)
         {
             if (Arguments is null)
-                BasePanic.Throw($"Insufficient function arguments, have not been passed {index+1} argument/s", "Runtime");
+                BasePanic.Throw($"Insufficient function arguments, have not been passed {index+1} argument/s", 4, "Runtime");
             if (index < 0)
-                BasePanic.Throw("Can not index function argument with a negative index", "Runtime");
+                BasePanic.Throw("Can not index function argument with a negative index", 5, "Runtime");
             if (index < Arguments.Length)
                 return Arguments[index];
-            BasePanic.Throw($"Insufficient function arguments, have not been passed {index+1} argument/s", "Runtime");
+            BasePanic.Throw($"Insufficient function arguments, have not been passed {index+1} argument/s", 6, "Runtime");
             return null;
         }
         public void PassArguments(object[] arguments)

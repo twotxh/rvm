@@ -22,7 +22,7 @@ namespace RobinVM
         /// <param name="program">Functions</param>
         public static void Execute(this Image programImage)
         {
-            Runtime.Stack.Clear();
+            programImage.InitializeBuiltIn();
             Runtime.Storage = new object[byte.MaxValue];
             Runtime.RuntimeImage = programImage;
             programImage.EntryPointPointer.ExecuteLabel(programImage.ManifestName);

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Runtime.InteropServices;
 
 namespace RobinVM.Models
 {
@@ -8,6 +9,47 @@ namespace RobinVM.Models
         public static Image New(string manifestName, ref Function entryPoint)
         {
             return new Image(manifestName, ref entryPoint);
+        }
+
+        public void InitializeBuiltIn()
+        {
+            CacheTable.Add("basepanic",
+                new Obj
+                {
+                    Ctor = new Function()
+                    {
+                        Instructions = new Instruction[]
+                        {
+                            Instruction.New(Runtime.LoadFromArgs, 0),
+                            Instruction.New(Runtime.LoadFromArgs, 1),
+                            Instruction.New(Runtime.StoreGlobal, "msg"),
+                            Instruction.New(Runtime.LoadFromArgs, 0),
+                            Instruction.New(Runtime.LoadFromArgs, 2),
+                            Instruction.New(Runtime.StoreGlobal, "code"),
+                            Instruction.New(Runtime.LoadFromArgs, 0),
+                            Instruction.New(Runtime.LoadFromArgs, 3),
+                            Instruction.New(Runtime.StoreGlobal, "type"),
+                            Instruction.New(Runtime.Return)
+                        }
+                    },
+                    CacheTable = new Dictionary<string, object>()
+                    {
+                        { "msg", null },
+                        { "code", null },
+                        { "type", "BasePanic" },
+                        { "throw(.)",
+                            new Function
+                            {
+                                Instructions = new Instruction[]
+                                {
+                                    Instruction.New(Runtime.LoadFromArgs, 0),
+                                    Instruction.New(Runtime.RvmThrow),
+                                    Instruction.New(Runtime.Return),
+                                }
+                            }
+                        }
+                    }
+                });
         }
 
         readonly public string ManifestName;
@@ -26,44 +68,44 @@ namespace RobinVM.Models
         {
             if (CacheTable.TryGetValue(id, out object value))
                 return (Function)value;
-            BasePanic.Throw($"Undifined function `{id}`", "Runtime");
+            BasePanic.Throw($"Undifined function `{id}`", 24, "Runtime");
             return (Function)new object();
         }
         public Obj FindObj(string id)
         {
             if (CacheTable.TryGetValue(id, out object value))
                 return (Obj)value;
-            BasePanic.Throw($"Undifined obj `{id}`", "Runtime");
+            BasePanic.Throw($"Undifined obj `{id}`", 23, "Runtime");
             return (Obj)new object();
         }
         public object FindGlobal(string id)
         {
             if (CacheTable.TryGetValue(id, out object value))
                 return (Function)value;
-            BasePanic.Throw($"Undifined global variable `{id}`", "Runtime");
+            BasePanic.Throw($"Undifined global variable `{id}`", 22, "Runtime");
             return null;
         }
         public void AddFunction(string id, Function function)
         {
             if (function.UninstantiatedLabels())
-                BasePanic.Throw($"Uninstantiated labels table in function `{id}`, instantiate it in this way: `new Function(instructions: null) {{/*body*/}}", "PreRuntime");
+                BasePanic.Throw($"Uninstantiated labels table in function `{id}`, instantiate it in this way: `new Function(instructions: null) {{/*body*/}}", 21, "PreRuntime");
             if (!this.CacheTable.TryAdd(id, function))
-                BasePanic.Throw($"Already defined function `{id}`", "Runtime");
+                BasePanic.Throw($"Already defined function `{id}`", 20, "Runtime");
         }
         public void AddObj(string id, Obj @object)
         {
             if (@object.CacheTable == null)
-                BasePanic.Throw($"Obj `{id}` does not contain members", "PreRuntime");
+                BasePanic.Throw($"Obj `{id}` does not contain members", 25, "PreRuntime");
             @object.CacheTable.TryAdd("$", id);
             if (@object.Ctor == null)
-                BasePanic.Throw($"Obj `{id}` does not contain a definition for ctor function", "PreRuntime");
+                BasePanic.Throw($"Obj `{id}` does not contain a definition for ctor function", 19, "PreRuntime");
             if (!this.CacheTable.TryAdd(id, @object))
-                BasePanic.Throw($"Already defined obj `{id}`", "Runtime");
+                BasePanic.Throw($"Already defined obj `{id}`", 18, "Runtime");
         }
         public void AddGlobal(string id, object global)
         {
             if (!this.CacheTable.TryAdd(id, global))
-                BasePanic.Throw($"Already defined global variable `{id}`", "Runtime");
+                BasePanic.Throw($"Already defined global variable `{id}`", 18, "Runtime");
         }
 
         public Dictionary<string, object> GetCacheTable()

@@ -75,7 +75,11 @@ namespace RobinVM
         /// Pops the instance loaded onto the stack and store the global
         /// </summary>
         /// <param name="args">Name of global</param>
-        public static void StoreGlobal(object args) => Stack.Pop<CacheTable>()[(string)args] = Stack.Pop();
+        public static void StoreGlobal(object args)
+        {
+            var p = Stack.Pop();
+            Stack.Pop<CacheTable>()[(string)args] = p;
+        }
 
         /// <summary>
         /// Calls a function
@@ -117,13 +121,13 @@ namespace RobinVM
         public static void LoadGlobal(object args) => Stack.Push(((CacheTable)Stack.Pop())[(string)args]);
 
         /// <summary>
-        /// Loads onto the stack a constant
+        /// Loads onto the stack a function argument
         /// </summary>
         /// <param name="args">Constant to load onto the stack</param>
         public static void LoadFromArgs(object args) => Stack.Push(CurrentFunctionPointer.FindArgument(Convert.ToByte(args)));
 
         /// <summary>
-        /// Loads onto the stack a global variable
+        /// Loads onto the stack the current runtime image
         /// </summary>
         /// <param name="args">G-lobal variable id</param>
         public static void LoadRuntimeImage(object args) => Stack.Push(RuntimeImage.GetCacheTable());
@@ -168,7 +172,7 @@ namespace RobinVM
         public static void Try(object args)
         {
             if (BasePanic.TryScopeTarget != null)
-                BasePanic.Throw("Can not initialize try environment in the scope of another try environment", "PreRuntime");
+                BasePanic.Throw("Can not initialize try environment in the scope of another try environment", 14, "PreRuntime");
             BasePanic.TryScopeTarget = args;
         }
         /// <summary>
@@ -178,7 +182,7 @@ namespace RobinVM
         public static void TryLabel(object args)
         {
             if (BasePanic.TryScopeTarget != null)
-                BasePanic.Throw("Can not initialize try environment in the scope of another try environment", "PreRuntime");
+                BasePanic.Throw("Can not initialize try environment in the scope of another try environment", 7, "PreRuntime");
             BasePanic.TryScopeTarget = CurrentFunctionPointer.FindLabel((string)args);
         }
 
@@ -197,9 +201,7 @@ namespace RobinVM
         /// <param name="args"></param>
         public static void OnPanic(object args)
         {
-            if (BasePanic.TryScopeTarget == null)
-                BasePanic.Throw("Initialized alone onpanic statement, declare before a try statement", "PreRuntime");
-            //BasePanic.TryScopeTarget = null;
+            BasePanic.TryScopeTarget = null;
         }
 
         /// <summary>
@@ -211,7 +213,7 @@ namespace RobinVM
             object p = Stack.Pop();
             object p1 = Stack.Pop();
             if (p.GetType() != p1.GetType())
-                BasePanic.Throw("Tryed to perform operation `Add` between types `" + p1.GetType() + "` & `" + p.GetType() + "`", "Runtime");
+                BasePanic.Throw("Tryed to perform operation `Add` between types `" + p1.GetType() + "` & `" + p.GetType() + "`", 16, "Runtime");
             if (p is string) Stack.Push((string)p1 + (string)p);
             else if (p is byte) Stack.Push((byte)p1 + (byte)p);
             else if (p is short) Stack.Push((short)p1 + (short)p);
@@ -220,7 +222,7 @@ namespace RobinVM
             else if (p is float) Stack.Push((float)p1 + (float)p);
             else if (p is double) Stack.Push((double)p1 + (double)p);
             else if (p is decimal) Stack.Push((decimal)p1 + (decimal)p);
-            else BasePanic.Throw("Unsupported operation `Add` in type `" + p1.GetType() + "`", "Runtime");
+            else BasePanic.Throw("Unsupported operation `Add` by type `" + p1.GetType() + "`", 15, "Runtime");
         }
 
         /// <summary>
@@ -232,7 +234,7 @@ namespace RobinVM
             object p = Stack.Pop();
             object p1 = Stack.Pop();
             if (p.GetType() != p1.GetType())
-                BasePanic.Throw("Unperformable operation `Sub` between types `" + p1.GetType() + "` & `" + p.GetType() + "`", "Runtime");
+                BasePanic.Throw("Unperformable operation `Sub` between types `" + p1.GetType() + "` & `" + p.GetType() + "`", 33, "Runtime");
             if (p is byte) Stack.Push((byte)p1 - (byte)p);
             else if (p is short) Stack.Push((short)p1 + (short)p);
             else if (p is int) Stack.Push((int)p1 - (int)p);
@@ -240,7 +242,7 @@ namespace RobinVM
             else if (p is float) Stack.Push((float)p1 - (float)p);
             else if (p is double) Stack.Push((double)p1 - (double)p);
             else if (p is decimal) Stack.Push((decimal)p1 - (decimal)p);
-            else BasePanic.Throw("Unsupported operation `Sub` in type `" + p1.GetType() + "`", "Runtime");
+            else BasePanic.Throw("Unsupported operation `Sub` by type `" + p1.GetType() + "`", 32, "Runtime");
         }
 
         /// <summary>
@@ -252,7 +254,7 @@ namespace RobinVM
             object p = Stack.Pop();
             object p1 = Stack.Pop();
             if (p.GetType() != p1.GetType())
-                BasePanic.Throw("Tryed to perform operation `Div` between types `" + p1.GetType() + "` & `" + p.GetType() + "`", "Runtime");
+                BasePanic.Throw("Tryed to perform operation `Div` between types `" + p1.GetType() + "` & `" + p.GetType() + "`", 26, "Runtime");
             if (p is byte) Stack.Push((byte)p1 / (byte)p);
             else if (p is short) Stack.Push((short)p1 / (short)p);
             else if (p is int) Stack.Push((int)p1 / (int)p);
@@ -260,7 +262,7 @@ namespace RobinVM
             else if (p is float) Stack.Push((float)p1 / (float)p);
             else if (p is double) Stack.Push((double)p1 / (double)p);
             else if (p is decimal) Stack.Push((decimal)p1 / (decimal)p);
-            else BasePanic.Throw("Unsupported operation `Div` in type `" + p1.GetType() + "`", "Runtime");
+            else BasePanic.Throw("Unsupported operation `Div` by type `" + p1.GetType() + "`", 27, "Runtime");
         }
 
         /// <summary>
@@ -272,7 +274,7 @@ namespace RobinVM
             object p = Stack.Pop();
             object p1 = Stack.Pop();
             if (p.GetType() != p1.GetType())
-                BasePanic.Throw("Tryed to perform operation `Mul` between types `" + p1.GetType() + "` & `" + p.GetType() + "`", "Runtime");
+                BasePanic.Throw("Tryed to perform operation `Mul` between types `" + p1.GetType() + "` & `" + p.GetType() + "`", 28, "Runtime");
             if (p is byte) Stack.Push((byte)p1 * (byte)p);
             else if (p is short) Stack.Push((short)p1 * (short)p);
             else if (p is int) Stack.Push((int)p1 * (int)p);
@@ -280,7 +282,7 @@ namespace RobinVM
             else if (p is float) Stack.Push((float)p1 * (float)p);
             else if (p is double) Stack.Push((double)p1 * (double)p);
             else if (p is decimal) Stack.Push((decimal)p1 * (decimal)p);
-            else BasePanic.Throw("Unsupported operation `Mul` in type `" + p1.GetType() + "`", "Runtime");
+            else BasePanic.Throw("Unsupported operation `Mul` by type `" + p1.GetType() + "`", 29, "Runtime");
         }
 
         /// <summary>
@@ -317,7 +319,10 @@ namespace RobinVM
         /// Throws a new exception with a string parameter as message
         /// </summary>
         /// <param name="args"></param>
-        public static void RvmThrow(object args) => BasePanic.Throw((string)Stack.Pop(), "Runtime");
+        public static void RvmThrow(object args)
+        {
+            BasePanic.Throw((CacheTable)Stack.Pop(), "Runtime");
+        }
 
         /// <summary>
         /// Pops the last element of the stack
@@ -352,7 +357,7 @@ namespace RobinVM
             object p = Stack.Pop();
             object p1 = Stack.Pop();
             if (p.GetType() != p1.GetType())
-                throw new NotSupportedException("Cannot perform operation `CompareGreater` between types `" + p1.GetType() + "` & `" + p.GetType() + "`");
+                BasePanic.Throw("Tryed to perform operation `CompareGreater` between types `" + p1.GetType() + "` & `" + p.GetType() + "`", 28, "Runtime");
             if (p is byte) Stack.Push((byte)p1 > (byte)p);
             else if (p is short) Stack.Push((short)p1 > (short)p);
             else if (p is int) Stack.Push((int)p1 > (int)p);
@@ -360,7 +365,7 @@ namespace RobinVM
             else if (p is float) Stack.Push((float)p1 > (float)p);
             else if (p is double) Stack.Push((double)p1 > (double)p);
             else if (p is decimal) Stack.Push((decimal)p1 > (decimal)p);
-            else throw new NotSupportedException("Cannot perform operation `CompareGreater` with type `" + p1.GetType() + "`");
+            else BasePanic.Throw("Unsupported operation `CompareGreater` by type `" + p1.GetType() + "`", 29, "Runtime");
         }
 
         /// <summary>
@@ -372,7 +377,7 @@ namespace RobinVM
             object p = Stack.Pop();
             object p1 = Stack.Pop();
             if (p.GetType() != p1.GetType())
-                throw new NotSupportedException("Cannot perform operation `CompareLess` between types `" + p1.GetType() + "` & `" + p.GetType() + "`");
+                BasePanic.Throw("Tryed to perform operation `CompareLess` between types `" + p1.GetType() + "` & `" + p.GetType() + "`", 28, "Runtime");
             if (p is byte) Stack.Push((byte)p1 < (byte)p);
             else if (p is short) Stack.Push((short)p1 < (short)p);
             else if (p is int) Stack.Push((int)p1 < (int)p);
@@ -380,7 +385,7 @@ namespace RobinVM
             else if (p is float) Stack.Push((float)p1 < (float)p);
             else if (p is double) Stack.Push((double)p1 < (double)p);
             else if (p is decimal) Stack.Push((decimal)p1 < (decimal)p);
-            else throw new NotSupportedException("Cannot perform operation `CompareLess` with type `" + p1.GetType() + "`");
+            else BasePanic.Throw("Unsupported operation `CompareLess` by type `" + p1.GetType() + "`", 29, "Runtime");
         }
 
         /// <summary>
