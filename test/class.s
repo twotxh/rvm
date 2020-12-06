@@ -3,10 +3,18 @@
 .end
 
 .obj "person"
-    .var "name" null .end
-    .var "surname" null .end
-    .var "age" null .end
-    .var "title" null .end
+    .var "name"
+        null
+    .end
+    .var "surname"
+        null
+    .end
+    .var "age"
+        null
+    .end
+    .var "title"
+        null
+    .end
     .ctor
         load:arg 0
         load:arg 1
@@ -46,7 +54,7 @@
     .end
 .end
 
-.ctor ; main
+.ctor                               ; main
     load:c "n"
     load:c "s"
     load:c 0

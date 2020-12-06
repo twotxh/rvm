@@ -22,13 +22,13 @@ namespace RobinVM
         public static void CastToInt<T>(object args) => Stack.Push(Stack.Peek() is T);
 
         /// <summary>
-        /// Casts last element onto the stack to int32 and push result
+        /// Casts last element onto the stack to int32 and pushes result
         /// </summary>
         /// <param name="args"></param>
         public static void CastToInt(object args) => Stack.Push(Convert.ToInt32(Stack.Pop()));
 
         /// <summary>
-        /// Casts last element onto the stack to int32 and push result
+        /// Casts last element onto the stack to <typeparamref name="T"/> and pushes result
         /// </summary>
         /// <param name="args"></param>
         public static void Cast<T>(object args) => Stack.Push(Convert.ChangeType(Stack.Pop(), typeof(T)));
@@ -437,6 +437,16 @@ namespace RobinVM
         {
             if (!(bool)Stack.Pop())
                 ProgramCounter = CurrentFunctionPointer.FindLabel((string)args) - 1;
+        }
+
+
+        /// <summary>
+        /// Pops last element of the stack and jump to <paramref name="args"/> if false
+        /// </summary>
+        /// <param name="args">Index of instruction to jump on</param>
+        public static void Skip(object args)
+        {
+            ProgramCounter += (int)args;
         }
 
         /// <summary>

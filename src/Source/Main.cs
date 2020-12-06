@@ -6,21 +6,24 @@ using System.Diagnostics;
 
 class Test
 {
-    static void ExtensionMethod()
-    {
-        Console.WriteLine("Inside ExtensionMethod...");
-        Console.WriteLine(@"From here you can access to all runtime vm services
-For example i can debug the stack by drawing it:");
-        Runtime.Stack.DrawStack();
-    }
-
     static void Main()
     {
-
         var main = Function.New
         (
-            Instruction.New(Runtime.Load, (Runtime.CallPointer)ExtensionMethod),
-            Instruction.New(Runtime.RvmCall),
+            Instruction.New(Runtime.RvmInput),  // ask for input
+            Instruction.New(Runtime.CastToInt), // cast input into int
+            Instruction.New(Runtime.RvmInput),
+            Instruction.New(Runtime.CastToInt),
+
+            Instruction.New(Runtime.CompareEQ), // pop two element from stack and push bool: true if eq, else false
+
+            Instruction.New(Runtime.SkipFalse, 3),  // skip the execution of 2 instructions if stack pop is false
+                Instruction.New(Runtime.Load, "=="), // print == if eq
+                Instruction.New(Runtime.RvmOutput),
+                Instruction.New(Runtime.Skip, 2),    // go out of else scope
+            Instruction.New(Runtime.Load, "!="),
+            Instruction.New(Runtime.RvmOutput),
+
             Instruction.New(Runtime.Return)
         );
 
