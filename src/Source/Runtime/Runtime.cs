@@ -133,25 +133,30 @@ namespace RobinVM
         public static void LoadRuntimeImage(object args) => Stack.Push(RuntimeImage.GetCacheTable());
 
         /// <summary>
-        /// Takes last element on the stack as array, the second last as index of the element to change and tird last as value to replace with,
-        /// changes the value and push it onto the stack
+        /// Takes last element on the stack as index, the second last as the new value to replace with and the tird last
+        /// as array to operate in
         /// </summary>
         /// <param name="args"></param>
         /// <typeparam name="T">Type of array<br/>Example: int[] => StoreElementIntoArray&lt;int&gt;()</typeparam>
         public static void StoreElementIntoArray(object args)
         {
-            object arr = Stack.Pop();
-            ((object[])arr)[(int)Stack.Pop()] = Stack.Pop();
+            var p = (int)Stack.Pop();
+            var val = Stack.Pop();
+            var arr = (object[])Stack.Pop();
+            arr[p] = val;
             Stack.Push(arr);
         }
 
         /// <summary>
-        /// Takes last element on the stack as array, the second last as index of the element to get and
-        /// pushes it onto the stack
+        /// Takes last element on the stack as index of the element to push onto the stack, the second last as array
         /// </summary>
         /// <param name="args"></param>
         /// <typeparam name="T">Type of array<br/>Example: int[] => StoreElementIntoArray&lt;int&gt;()</typeparam>
-        public static void LoadElementFromArray(object args) => Stack.Push(((object[])Stack.Pop())[(int)Stack.Pop()]);
+        public static void LoadElementFromArray(object args)
+        {
+            var p = (int)Stack.Pop();
+            Stack.Push(((object[])Stack.Pop())[p]);
+        }
 
         /// <summary>
         /// Clears stack

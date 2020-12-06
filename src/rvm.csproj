@@ -2,10 +2,10 @@
 
   <PropertyGroup>
     <OutputType>exe</OutputType>
-	
     <TargetFramework>netcoreapp3.1</TargetFramework>
-    <NeutralLanguage />
-    <Platforms>AnyCPU;x64</Platforms>
+    <AssemblyName>RobinVM</AssemblyName>
+    <RootNamespace>RobinVM</RootNamespace>
+    <!--GenerateDocumentationFile>true</GenerateDocumentationFile-->
   </PropertyGroup>
 
 </Project>
