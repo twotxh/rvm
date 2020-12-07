@@ -1,6 +1,6 @@
 <img width="200" height="200" src="extra/robin.png" align="right" />
 
-# RobinVM [Presentation](https://www.youtube.com/watch?v=kuJoJ9rFCFE&t)
+# [RobinVM](https://www.youtube.com/watch?v=kuJoJ9rFCFE&t)
 > Robin Virtual Machine
 <br/>
 <br/>
