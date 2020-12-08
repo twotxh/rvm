@@ -29,7 +29,7 @@ namespace RobinVM.Models
 {
     public partial struct Image
     {
-        public void InitializeBuiltIn()
+        void InitializeBuiltIn()
         {
             CacheTable.Add("basepanic",
                 new Obj
