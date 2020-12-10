@@ -13,5 +13,5 @@
 <h4>3. RVM is a object oriented vm</h4>
 <h4>4. RVM is a untyped system</h4>
 <h4>5. RVM is a modern vm: it supports objects, classes, functions, for iter cycle, exception handling</h4>
-<h4>6. RVM is a exensible vm, it can be customized and extended by the user</h4>
+<h4>6. RVM is a extensible vm, it can be customized and extended by the user</h4>
 <hr/>
